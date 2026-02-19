@@ -1,16 +1,28 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { randomBytes } from "crypto";
 
 // Force Node.js runtime — required for nodemailer (not compatible with Edge runtime)
 export const runtime = "nodejs";
 
+/** HTML-escape to prevent XSS in email templates */
+function esc(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /**
- * Generates a case ID like TS4-20260218-A3F7
+ * Generates a cryptographically secure case ID like TS4-20260218-A3F7
  */
 function generateCaseId() {
   const now = new Date();
   const date = now.toISOString().slice(0, 10).replace(/-/g, "");
-  const rand = Math.random().toString(36).toUpperCase().slice(2, 6);
+  const rand = randomBytes(3).toString("hex").toUpperCase().slice(0, 4);
   return `TS4-${date}-${rand}`;
 }
 
@@ -46,6 +58,14 @@ export async function POST(request) {
         { error: "Name, email, and message are required." },
         { status: 400 }
       );
+    }
+
+    // Length limits
+    if (name.length > 150) {
+      return NextResponse.json({ error: "Name too long." }, { status: 400 });
+    }
+    if (message.length > 5000) {
+      return NextResponse.json({ error: "Message too long (max 5000 chars)." }, { status: 400 });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -100,7 +120,7 @@ export async function POST(request) {
           <td style="padding:40px;">
             <h2 style="color:#1e293b;font-size:20px;margin:0 0 16px;">We've Received Your Request ✅</h2>
             <p style="color:#475569;font-size:15px;line-height:1.6;margin:0 0 20px;">
-              Hi <strong>${name}</strong>,<br><br>
+              Hi <strong>${esc(name)}</strong>,<br><br>
               Thank you for contacting TechSupport4. Our certified technicians will review your request and get back to you shortly — usually within <strong>30–60 minutes</strong>.
             </p>
 
@@ -109,7 +129,7 @@ export async function POST(request) {
               <tr>
                 <td style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:10px;padding:20px;text-align:center;">
                   <p style="color:#1e40af;font-size:13px;margin:0 0 6px;text-transform:uppercase;letter-spacing:0.05em;">Your Case Reference Number</p>
-                  <p style="color:#1e3a8a;font-size:28px;font-weight:700;font-family:monospace;margin:0;letter-spacing:0.1em;">${caseId}</p>
+                  <p style="color:#1e3a8a;font-size:28px;font-weight:700;font-family:monospace;margin:0;letter-spacing:0.1em;">${esc(caseId)}</p>
                   <p style="color:#64748b;font-size:12px;margin:8px 0 0;">Please keep this for your records. Quote it in any follow-up.</p>
                 </td>
               </tr>
@@ -120,16 +140,16 @@ export async function POST(request) {
             <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;font-size:14px;margin-bottom:24px;">
               <tr style="background:#f8fafc;">
                 <td style="padding:10px 16px;color:#64748b;font-weight:600;width:120px;">Name</td>
-                <td style="padding:10px 16px;color:#1e293b;">${name}</td>
+                <td style="padding:10px 16px;color:#1e293b;">${esc(name)}</td>
               </tr>
               <tr>
                 <td style="padding:10px 16px;color:#64748b;font-weight:600;">Email</td>
-                <td style="padding:10px 16px;color:#1e293b;">${email}</td>
+                <td style="padding:10px 16px;color:#1e293b;">${esc(email)}</td>
               </tr>
-              ${phone ? `<tr style="background:#f8fafc;"><td style="padding:10px 16px;color:#64748b;font-weight:600;">Phone</td><td style="padding:10px 16px;color:#1e293b;">${phone}</td></tr>` : ""}
+              ${phone ? `<tr style="background:#f8fafc;"><td style="padding:10px 16px;color:#64748b;font-weight:600;">Phone</td><td style="padding:10px 16px;color:#1e293b;">${esc(phone)}</td></tr>` : ""}
               <tr ${phone ? "" : 'style="background:#f8fafc;"'}>
                 <td style="padding:10px 16px;color:#64748b;font-weight:600;vertical-align:top;">Issue</td>
-                <td style="padding:10px 16px;color:#1e293b;">${message.replace(/\n/g, "<br>")}</td>
+                <td style="padding:10px 16px;color:#1e293b;">${esc(message).replace(/\n/g, "<br>")}</td>
               </tr>
             </table>
 
@@ -187,20 +207,20 @@ export async function POST(request) {
             <table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#cbd5e1;">
               <tr>
                 <td style="padding:8px 0;border-bottom:1px solid #334155;font-weight:700;color:#94a3b8;width:110px;">Case ID</td>
-                <td style="padding:8px 0;border-bottom:1px solid #334155;color:#60a5fa;font-family:monospace;font-size:16px;font-weight:700;">${caseId}</td>
+                <td style="padding:8px 0;border-bottom:1px solid #334155;color:#60a5fa;font-family:monospace;font-size:16px;font-weight:700;">${esc(caseId)}</td>
               </tr>
               <tr>
                 <td style="padding:8px 0;border-bottom:1px solid #334155;font-weight:700;color:#94a3b8;">Name</td>
-                <td style="padding:8px 0;border-bottom:1px solid #334155;">${name}</td>
+                <td style="padding:8px 0;border-bottom:1px solid #334155;">${esc(name)}</td>
               </tr>
               <tr>
                 <td style="padding:8px 0;border-bottom:1px solid #334155;font-weight:700;color:#94a3b8;">Email</td>
-                <td style="padding:8px 0;border-bottom:1px solid #334155;"><a href="mailto:${email}" style="color:#60a5fa;">${email}</a></td>
+                <td style="padding:8px 0;border-bottom:1px solid #334155;"><a href="mailto:${esc(email)}" style="color:#60a5fa;">${esc(email)}</a></td>
               </tr>
-              ${phone ? `<tr><td style="padding:8px 0;border-bottom:1px solid #334155;font-weight:700;color:#94a3b8;">Phone</td><td style="padding:8px 0;border-bottom:1px solid #334155;">${phone}</td></tr>` : ""}
+              ${phone ? `<tr><td style="padding:8px 0;border-bottom:1px solid #334155;font-weight:700;color:#94a3b8;">Phone</td><td style="padding:8px 0;border-bottom:1px solid #334155;">${esc(phone)}</td></tr>` : ""}
               <tr>
                 <td style="padding:8px 0;font-weight:700;color:#94a3b8;vertical-align:top;">Message</td>
-                <td style="padding:8px 0;white-space:pre-wrap;">${message}</td>
+                <td style="padding:8px 0;white-space:pre-wrap;">${esc(message)}</td>
               </tr>
             </table>
             <p style="color:#64748b;font-size:12px;margin:20px 0 0;">Submitted: ${new Date().toUTCString()}</p>
