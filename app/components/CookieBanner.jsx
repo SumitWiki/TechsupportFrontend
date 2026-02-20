@@ -24,7 +24,7 @@ export default function CookieBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 w-full bg-slate-900 text-white p-5 z-50 border-t border-slate-700 shadow-2xl">
+    <div className="fixed bottom-0 md:bottom-0 mb-[72px] md:mb-0 w-full bg-slate-900 text-white p-5 z-50 border-t border-slate-700 shadow-2xl">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <p className="text-sm text-slate-300 max-w-2xl">
           We use cookies to improve your experience and analyse site traffic.
