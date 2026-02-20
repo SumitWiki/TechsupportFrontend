@@ -62,7 +62,7 @@ export default function AdminLogin() {
             <label className="block text-sm text-slate-300 mb-1">Email</label>
             <input
               type="email"
-              placeholder="admin@techsupport4.com"
+              placeholder="support@techsupport4.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
