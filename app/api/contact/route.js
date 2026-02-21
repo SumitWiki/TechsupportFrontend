@@ -76,6 +76,36 @@ export async function POST(request) {
       );
     }
 
+    // ══════════════════════════════════════════════════════════════════════════
+    // SAVE TO CRM DATABASE — creates a case/ticket that appears in the CRM dashboard
+    // ══════════════════════════════════════════════════════════════════════════
+    let crmCaseId = null;
+    const crmApiUrl = process.env.CRM_API_URL || process.env.NEXT_PUBLIC_CRM_API_URL;
+    if (crmApiUrl) {
+      try {
+        const crmResponse = await fetch(`${crmApiUrl}/api/cases/contact`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            phone: phone || "N/A",
+            subject: "Contact Form Submission",
+            message,
+          }),
+        });
+        if (crmResponse.ok) {
+          const crmData = await crmResponse.json();
+          crmCaseId = crmData.caseId;
+          console.log(`✅ Case saved to CRM: ${crmCaseId}`);
+        } else {
+          console.warn("⚠️  CRM API returned error:", await crmResponse.text());
+        }
+      } catch (crmErr) {
+        console.warn("⚠️  Failed to save to CRM (will continue with email):", crmErr.message);
+      }
+    }
+
     // Check email credentials are configured (not placeholder values)
     const smtpUser = process.env.SMTP_USER || "";
     const smtpPass = process.env.SMTP_PASS || "";
@@ -89,11 +119,12 @@ export async function POST(request) {
     if (!smtpConfigured) {
       console.warn("SMTP not configured — skipping email send.");
       // Still return success so the form works even without email configured
-      const caseId = generateCaseId();
-      return NextResponse.json({ ok: true, caseId, emailSent: false });
+      const caseId = crmCaseId || generateCaseId();
+      return NextResponse.json({ ok: true, caseId, emailSent: false, savedToCRM: !!crmCaseId });
     }
 
-    const caseId = generateCaseId();
+    // Use CRM case ID if available, otherwise generate locally
+    const caseId = crmCaseId || generateCaseId();
     const transporter = createTransporter();
     const ownerEmail = process.env.OWNER_EMAIL || process.env.SMTP_USER;
     // Use SMTP_USER as sender — most SMTP servers reject relay from different addresses
@@ -253,7 +284,7 @@ export async function POST(request) {
       }),
     ]);
 
-    return NextResponse.json({ ok: true, caseId, emailSent: true });
+    return NextResponse.json({ ok: true, caseId, emailSent: true, savedToCRM: !!crmCaseId });
   } catch (err) {
     console.error("Contact API error:", err);
     return NextResponse.json(

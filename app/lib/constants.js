@@ -10,6 +10,10 @@ export const SITE_URL =
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
+// CRM Backend URL - for saving contact form submissions to the CRM database
+export const CRM_API_URL =
+  process.env.NEXT_PUBLIC_CRM_API_URL || "https://crm.techsupport4.com";
+
 // Phone numbers — replace values in .env.local or .env.production
 export const PHONE_USA =
   process.env.NEXT_PUBLIC_PHONE_USA || "+18005551234";
