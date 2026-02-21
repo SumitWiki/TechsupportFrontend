@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { FaUser, FaEnvelope, FaPhone, FaCheckCircle } from "react-icons/fa";
-import { API_URL } from "../lib/constants";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -49,7 +48,7 @@ export default function ContactForm() {
     setStatus(null);
     try {
       const { _honey, ...payload } = formData;
-      const res = await fetch(`${API_URL}/api/contact`, {
+      const res = await fetch(`/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
