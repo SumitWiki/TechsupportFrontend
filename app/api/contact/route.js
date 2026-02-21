@@ -96,7 +96,8 @@ export async function POST(request) {
     const caseId = generateCaseId();
     const transporter = createTransporter();
     const ownerEmail = process.env.OWNER_EMAIL || process.env.SMTP_USER;
-    const fromAddress = `TechSupport4 <no-reply@techsupport4.com>`;
+    // Use SMTP_USER as sender — most SMTP servers reject relay from different addresses
+    const fromAddress = `TechSupport4 <${process.env.SMTP_USER}>`;
     const replyTo = process.env.SMTP_USER;
 
     // ── 1. Confirmation email to the customer ──────────────────────────────
