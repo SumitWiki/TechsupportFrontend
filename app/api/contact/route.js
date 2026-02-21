@@ -273,41 +273,45 @@ export async function POST(request) {
     </td></tr>
   </table>
 </body>
-                // Only send emails if CRM API succeeded (crmCaseId exists)
-                if (!crmCaseId) {
-                  // CRM API failed, return error to user, do NOT send email
-                  return NextResponse.json({ error: crmSaveError || "Failed to save ticket in CRM." }, { status: 500 });
-                }
+</html>`;
 
-                if (!smtpConfigured) {
-                  console.warn("SMTP not configured — skipping email send.");
-                  return NextResponse.json({ ok: true, caseId: crmCaseId, emailSent: false, savedToCRM: true });
-                }
+                // Only send emails if CRM API succeeded
+if (!crmCaseId) {
+  return NextResponse.json(
+    { error: crmSaveError || "Failed to save ticket in CRM." },
+    { status: 500 }
+  );
+}
 
-                // Use CRM case ID
-                const caseId = crmCaseId;
-                const transporter = createTransporter();
-                const ownerEmail = process.env.OWNER_EMAIL || process.env.SMTP_USER;
-                const fromAddress = `TechSupport4 <${process.env.SMTP_USER}>`;
-                const replyTo = process.env.SMTP_USER;
+await Promise.all([
+  transporter.sendMail({
+    from: fromAddress,
+    replyTo: replyTo,
+    to: email,
+    subject: `[${caseId}] We have received your TechSupport4 request`,
+    html: customerHtml,
+  }),
+  transporter.sendMail({
+    from: fromAddress,
+    replyTo: email,
+    to: ownerEmail,
+    subject: `[${caseId}] New Contact: ${name} — TechSupport4`,
+    html: ownerHtml,
+  }),
+]);
 
-                // ...existing code for customerHtml and ownerHtml...
+return NextResponse.json({
+  ok: true,
+  caseId,
+  emailSent: true,
+  savedToCRM: true,
+});
 
-                await Promise.all([
-                  transporter.sendMail({
-                    from: fromAddress,
-                    replyTo: replyTo,
-                    to: email,
-                    subject: `[${caseId}] We've received your TechSupport4 request`,
-                    html: customerHtml,
-                  }),
-                  transporter.sendMail({
-                    from: fromAddress,
-                    replyTo: email,
-                    to: ownerEmail,
-                    subject: `[${caseId}] New Contact: ${name} — TechSupport4`,
-                    html: ownerHtml,
-                  }),
-                ]);
-
-                return NextResponse.json({ ok: true, caseId, emailSent: true, savedToCRM: true });
+} catch (error) {
+  console.error("Contact API error:", error);
+  return NextResponse.json(
+    { error: "Internal Server Error" },
+    { status: 500 }
+  );
+}
+}
