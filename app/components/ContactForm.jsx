@@ -38,7 +38,7 @@ export default function ContactForm() {
     if (!formData.phone.trim()) {
       errs.phone = "Phone is required.";
     } else if (!/^\+1\d{10}$/.test(formData.phone.trim())) {
-      errs.phone = "Please add +1 followed by 10 digit US number.";
+      errs.phone = "Phone must start with +1 and contain exactly 10 digits after. Only digits and + allowed.";
     }
     if (!formData.message.trim()) errs.message = "Please describe your issue.";
     return errs;
@@ -107,11 +107,24 @@ export default function ContactForm() {
         </div>
 
         {/* Phone */}
-        <div className="relative">
-          <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60" />
-          <input name="phone" type="tel" value={formData.phone} onChange={handleChange}
-            placeholder="Phone (Optional)" autoComplete="tel"
-            className="w-full pl-10 pr-4 py-3 bg-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+        <div>
+          <div className="relative">
+            <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60" />
+            <input
+              name="phone"
+              type="tel"
+              required
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Phone (+1XXXXXXXXXX)"
+              autoComplete="tel"
+              pattern="^\+1\d{10}$"
+              className={`w-full pl-10 pr-4 py-3 bg-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 ${errors.phone ? "ring-2 ring-red-400" : "focus:ring-yellow-400"}`}
+            />
+          </div>
+          {errors.phone && (
+            <p className="text-red-300 text-xs mt-1">{errors.phone}</p>
+          )}
         </div>
 
         {/* Message */}
