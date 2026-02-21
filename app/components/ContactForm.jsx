@@ -48,9 +48,7 @@ export default function ContactForm() {
     setStatus(null);
     try {
       const { _honey, ...payload } = formData;
-      // Use CRM backend API for ticket creation
-      const { CRM_API_URL } = await import("../lib/constants");
-      const res = await fetch(`${CRM_API_URL}/api/cases/contact`, {
+      const res = await fetch(`/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
