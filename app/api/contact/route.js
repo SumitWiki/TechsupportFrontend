@@ -80,9 +80,14 @@ export async function POST(request) {
     // SAVE TO CRM DATABASE — creates a case/ticket that appears in the CRM dashboard
     // ══════════════════════════════════════════════════════════════════════════
     let crmCaseId = null;
+    let crmSaveError = null;
     const crmApiUrl = process.env.CRM_API_URL || process.env.NEXT_PUBLIC_CRM_API_URL;
+    
+    console.log("📍 CRM_API_URL configured:", crmApiUrl || "❌ NOT SET");
+    
     if (crmApiUrl) {
       try {
+        console.log(`🔄 Calling CRM API: ${crmApiUrl}/api/cases/contact`);
         const crmResponse = await fetch(`${crmApiUrl}/api/cases/contact`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -99,11 +104,17 @@ export async function POST(request) {
           crmCaseId = crmData.caseId;
           console.log(`✅ Case saved to CRM: ${crmCaseId}`);
         } else {
-          console.warn("⚠️  CRM API returned error:", await crmResponse.text());
+          const errText = await crmResponse.text();
+          crmSaveError = `CRM API error (${crmResponse.status}): ${errText}`;
+          console.error("❌ CRM API returned error:", crmSaveError);
         }
       } catch (crmErr) {
-        console.warn("⚠️  Failed to save to CRM (will continue with email):", crmErr.message);
+        crmSaveError = `CRM connection failed: ${crmErr.message}`;
+        console.error("❌ Failed to save to CRM:", crmSaveError);
       }
+    } else {
+      crmSaveError = "CRM_API_URL not configured in environment";
+      console.error("❌ CRM_API_URL is not set - tickets will NOT appear in CRM dashboard!");
     }
 
     // Check email credentials are configured (not placeholder values)
