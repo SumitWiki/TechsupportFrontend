@@ -35,6 +35,11 @@ export default function ContactForm() {
     if (!formData.email.trim()) errs.email = "Email is required.";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       errs.email = "Enter a valid email.";
+    if (!formData.phone.trim()) {
+      errs.phone = "Phone is required.";
+    } else if (!/^\+1\d{10}$/.test(formData.phone.trim())) {
+      errs.phone = "Please add +1 followed by 10 digit US number.";
+    }
     if (!formData.message.trim()) errs.message = "Please describe your issue.";
     return errs;
   };
