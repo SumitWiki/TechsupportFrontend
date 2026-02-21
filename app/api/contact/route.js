@@ -273,34 +273,41 @@ export async function POST(request) {
     </td></tr>
   </table>
 </body>
-</html>`;
+                // Only send emails if CRM API succeeded (crmCaseId exists)
+                if (!crmCaseId) {
+                  // CRM API failed, return error to user, do NOT send email
+                  return NextResponse.json({ error: crmSaveError || "Failed to save ticket in CRM." }, { status: 500 });
+                }
 
-    // Send both emails in parallel
-    await Promise.all([
-      // Confirmation to customer
-      transporter.sendMail({
-        from: fromAddress,
-        replyTo: replyTo,
-        to: email,
-        subject: `[${caseId}] We've received your TechSupport4 request`,
-        html: customerHtml,
-      }),
-      // Notification to owner
-      transporter.sendMail({
-        from: fromAddress,
-        replyTo: email, // reply goes to customer
-        to: ownerEmail,
-        subject: `[${caseId}] New Contact: ${name} — TechSupport4`,
-        html: ownerHtml,
-      }),
-    ]);
+                if (!smtpConfigured) {
+                  console.warn("SMTP not configured — skipping email send.");
+                  return NextResponse.json({ ok: true, caseId: crmCaseId, emailSent: false, savedToCRM: true });
+                }
 
-    return NextResponse.json({ ok: true, caseId, emailSent: true, savedToCRM: !!crmCaseId });
-  } catch (err) {
-    console.error("Contact API error:", err);
-    return NextResponse.json(
-      { error: "Failed to process your request. Please try again." },
-      { status: 500 }
-    );
-  }
-}
+                // Use CRM case ID
+                const caseId = crmCaseId;
+                const transporter = createTransporter();
+                const ownerEmail = process.env.OWNER_EMAIL || process.env.SMTP_USER;
+                const fromAddress = `TechSupport4 <${process.env.SMTP_USER}>`;
+                const replyTo = process.env.SMTP_USER;
+
+                // ...existing code for customerHtml and ownerHtml...
+
+                await Promise.all([
+                  transporter.sendMail({
+                    from: fromAddress,
+                    replyTo: replyTo,
+                    to: email,
+                    subject: `[${caseId}] We've received your TechSupport4 request`,
+                    html: customerHtml,
+                  }),
+                  transporter.sendMail({
+                    from: fromAddress,
+                    replyTo: email,
+                    to: ownerEmail,
+                    subject: `[${caseId}] New Contact: ${name} — TechSupport4`,
+                    html: ownerHtml,
+                  }),
+                ]);
+
+                return NextResponse.json({ ok: true, caseId, emailSent: true, savedToCRM: true });
