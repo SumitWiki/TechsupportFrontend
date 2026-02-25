@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { PHONE_USA, PHONE_DISPLAY } from "../lib/constants";
 
 export default function MobileMenu() {
@@ -40,18 +41,18 @@ export default function MobileMenu() {
             { label: "📶 Wi-Fi Support", href: "/wifi-router-support-usa" },
             { label: "📺 Smart TV Support", href: "/smart-tv-support-usa" },
             { label: "FAQ", href: "/faq" },
-            { label: "Blog", href: "/blog/how-to-fix-internet-not-working" },
+            { label: "Blog", href: "/blog" },
             { label: "Reviews", href: "/#reviews" },
             { label: "Contact", href: "/contact" },
           ].map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               onClick={close}
               className="block px-3 py-2 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
 
           <div className="pt-3 border-t border-slate-100">
@@ -61,12 +62,13 @@ export default function MobileMenu() {
             >
               📞 Call {PHONE_DISPLAY}
             </a>
-            <a
+            <Link
               href="/contact"
+              onClick={close}
               className="block w-full mt-2 bg-blue-600 text-white text-center py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
             >
               🔐 Secure Session
-            </a>
+            </Link>
           </div>
         </div>
       )}

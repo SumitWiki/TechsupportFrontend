@@ -1,4 +1,6 @@
 import Script from "next/script";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 const cities = {
   "internet-support-new-york": {
@@ -23,8 +25,13 @@ const cities = {
   },
 };
 
+export function generateStaticParams() {
+  return Object.keys(cities).map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({ params }) {
-  const data = cities[params.slug];
+  const { slug } = await params;
+  const data = cities[slug];
 
   if (!data) return {};
 
@@ -32,20 +39,17 @@ export async function generateMetadata({ params }) {
     title: `${data.service} in ${data.city} | TechSupport4`,
     description: `Professional ${data.service.toLowerCase()} services in ${data.city}, ${data.country}. Secure remote troubleshooting by certified experts.`,
     alternates: {
-      canonical: `https://techsupport4.com/location/${params.slug}`,
+      canonical: `/location/${slug}`,
     },
   };
 }
 
-export default function LocationPage({ params }) {
-  const data = cities[params.slug];
+export default async function LocationPage({ params }) {
+  const { slug } = await params;
+  const data = cities[slug];
 
   if (!data) {
-    return (
-      <main className="py-20 text-center">
-        <h1 className="text-3xl font-bold">Page Not Found</h1>
-      </main>
-    );
+    notFound();
   }
 
   return (
@@ -121,7 +125,7 @@ export default function LocationPage({ params }) {
                 "@type": "ListItem",
                 position: 2,
                 name: data.city,
-                item: `https://techsupport4.com/location/${params.slug}`,
+                item: `https://techsupport4.com/location/${slug}`,
               },
             ],
           }),
@@ -147,12 +151,12 @@ export default function LocationPage({ params }) {
             <li>✔ No home visit required</li>
           </ul>
 
-          <a
+          <Link
             href="/contact"
             className="inline-block mt-10 bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
           >
             Get Help Now
-          </a>
+          </Link>
 
         </div>
       </main>

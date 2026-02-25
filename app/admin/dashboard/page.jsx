@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const socketRef = useRef(null);
+  const fetchRef = useRef(null);
 
   // Fetch tickets using httpOnly cookie for auth (credentials: "include")
   const fetchTickets = async () => {
@@ -42,13 +43,18 @@ export default function Dashboard() {
     }
   };
 
+  // Keep fetchRef in sync so socket listener always calls latest version
+  useEffect(() => {
+    fetchRef.current = fetchTickets;
+  });
+
   // Connect socket only once, inside useEffect — never at module level
   useEffect(() => {
     socketRef.current = io(API_URL, {
       withCredentials: true, // send auth cookie with socket handshake
     });
 
-    socketRef.current.on("newTicket", () => fetchTickets());
+    socketRef.current.on("newTicket", () => fetchRef.current?.());
 
     return () => {
       socketRef.current?.disconnect();
@@ -62,19 +68,30 @@ export default function Dashboard() {
   }, [page, search]);
 
   const handleClose = async (id) => {
-    await fetch(`${API_URL}/api/admin/tickets/${id}/close`, {
-      method: "POST",
-      credentials: "include",
-    });
-    fetchTickets();
+    try {
+      const res = await fetch(`${API_URL}/api/admin/tickets/${id}/close`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        alert("Failed to close ticket. Please try again.");
+        return;
+      }
+      fetchTickets();
+    } catch {
+      alert("Network error. Please try again.");
+    }
   };
 
   const handleLogout = async () => {
-    // Ask backend to clear the httpOnly cookie
-    await fetch(`${API_URL}/api/admin/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
+    try {
+      await fetch(`${API_URL}/api/admin/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      // Even if logout API fails, redirect to login
+    }
     router.push("/admin/login");
     router.refresh();
   };

@@ -1,11 +1,76 @@
+import Script from "next/script";
+import Link from "next/link";
+
 export const metadata = {
   title: "Smart TV Support USA | Remote TV Help",
   description:
     "Remote smart TV support for USA customers. Fix streaming, Wi-Fi and app issues on Smart TVs securely.",
+  alternates: { canonical: "/smart-tv-support-usa" },
+  openGraph: {
+    title: "Smart TV Support USA | Remote TV Help",
+    description: "Remote smart TV support for USA customers. Fix streaming, Wi-Fi and app issues.",
+    url: "https://techsupport4.com/smart-tv-support-usa",
+  },
+  twitter: {
+    card: "summary",
+    title: "Smart TV Support USA | Remote TV Help",
+    description: "Remote smart TV support for USA customers.",
+  },
 };
 
 export default function SmartTVSupportUSA() {
   return (
+    <>
+      {/* SERVICE SCHEMA */}
+      <Script
+        id="smart-tv-service-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            serviceType: "Remote Smart TV Support",
+            provider: {
+              "@type": "Organization",
+              name: "TechSupport4",
+              url: "https://techsupport4.com",
+            },
+            areaServed: ["United States", "United Kingdom", "Canada"],
+            description: "Remote Smart TV troubleshooting, streaming app fixes, and TV connectivity support.",
+          }),
+        }}
+      />
+
+      {/* FAQ SCHEMA */}
+      <Script
+        id="smart-tv-faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Why is my Smart TV not connecting to Wi-Fi?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "This can be caused by incorrect Wi-Fi settings, router issues, or firmware updates needed on your TV.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Can you fix my Smart TV remotely?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes, most Smart TV issues including streaming, app, and connectivity problems can be resolved remotely.",
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
     <main className="bg-slate-50 text-slate-800">
 
       {/* HERO */}
@@ -69,16 +134,17 @@ export default function SmartTVSupportUSA() {
           <p className="mt-3 text-blue-100">
             Enjoy uninterrupted streaming today.
           </p>
-          <a
+          <Link
             href="/contact"
             className="inline-block mt-6 bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold"
           >
             Get Smart TV Support
-          </a>
+          </Link>
         </div>
       </section>
 
     </main>
+    </>
   );
 }
 

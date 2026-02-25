@@ -5,6 +5,16 @@ export const metadata = {
   description:
     "Find answers to common questions about TechSupport4 remote technical support services for internet, printer, Wi-Fi and Smart TV.",
   alternates: { canonical: "/faq" },
+  openGraph: {
+    title: "Frequently Asked Questions | TechSupport4",
+    description: "Find answers to common questions about TechSupport4 remote technical support services.",
+    url: "https://techsupport4.com/faq",
+  },
+  twitter: {
+    card: "summary",
+    title: "Frequently Asked Questions | TechSupport4",
+    description: "Find answers to common questions about TechSupport4 remote technical support services.",
+  },
 };
 
 export default function FAQPage() {

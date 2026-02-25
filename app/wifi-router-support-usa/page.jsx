@@ -6,6 +6,16 @@ export const metadata = {
   description:
     "Remote Wi-Fi and router support for USA customers. Fix slow Wi-Fi, router setup, connectivity issues, and network configuration securely.",
   alternates: { canonical: "/wifi-router-support-usa" },
+  openGraph: {
+    title: "Wi-Fi & Router Support USA | Remote Network Help",
+    description: "Remote Wi-Fi and router support for USA customers.",
+    url: "https://techsupport4.com/wifi-router-support-usa",
+  },
+  twitter: {
+    card: "summary",
+    title: "Wi-Fi & Router Support USA | Remote Network Help",
+    description: "Remote Wi-Fi and router support for USA customers.",
+  },
 };
 
 export default function WifiRouterSupportUSA() {

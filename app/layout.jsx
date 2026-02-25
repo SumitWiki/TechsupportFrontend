@@ -130,7 +130,7 @@ export default function RootLayout({ children }) {
               <a href="/" className="hover:text-blue-600">Home</a>
               <DesktopServicesMenu />
               <a href="/faq" className="hover:text-blue-600">FAQ</a>
-              <a href="/blog/how-to-fix-internet-not-working" className="hover:text-blue-600">Blog</a>
+              <a href="/blog" className="hover:text-blue-600">Blog</a>
               <a href="#reviews" className="hover:text-blue-600">Reviews</a>
               <a href="/contact" className="hover:text-blue-600">Contact</a>
               {/* Phone CTA — visible desktop only */}

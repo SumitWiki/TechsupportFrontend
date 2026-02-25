@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 
 export default function DesktopServicesMenu() {
   const [open, setOpen] = useState(false);
@@ -38,7 +39,7 @@ export default function DesktopServicesMenu() {
       {open && (
         <div className="absolute left-0 top-full mt-2 w-64 bg-white dark:bg-slate-800 shadow-xl rounded-xl py-2 z-50 border border-slate-200 dark:border-slate-700 animate-fadeIn">
           {services.map((s) => (
-            <a
+            <Link
               key={s.href}
               href={s.href}
               onClick={() => setOpen(false)}
@@ -46,7 +47,7 @@ export default function DesktopServicesMenu() {
             >
               <span className="text-lg">{s.icon}</span>
               {s.label}
-            </a>
+            </Link>
           ))}
         </div>
       )}

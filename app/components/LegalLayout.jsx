@@ -5,15 +5,12 @@ export default function LegalLayout({
   title,
   sections,
   version = "v1.0.0",
+  lastUpdated: lastUpdatedProp,
 }) {
   const [openSection, setOpenSection] = useState(null);
   const [active, setActive] = useState(null);
 
-  const lastUpdated = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const lastUpdated = lastUpdatedProp || "February 2026";
 
   useEffect(() => {
     const handleScroll = () => {

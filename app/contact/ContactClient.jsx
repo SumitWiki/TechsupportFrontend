@@ -9,6 +9,7 @@ export default function ContactClient() {
     email: "",
     phone: "",
     message: "",
+    _honey: "", // honeypot — bots fill this, humans don't
   });
 
   const [loading, setLoading] = useState(false);
@@ -50,10 +51,13 @@ export default function ContactClient() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Honeypot — silently reject bot submissions
+    if (formData._honey) return;
+
     // Phone validation before submit
     const digitsOnly = formData.phone.replace(/\D/g, "");
-    if (formData.phone && (!formData.phone.startsWith("+") || digitsOnly.length < 10)) {
-      setPhoneError("Please enter a valid phone number.");
+    if (formData.phone && (!formData.phone.startsWith("+1") || digitsOnly.length !== 11)) {
+      setPhoneError("Phone must start with +1 and contain exactly 10 digits after.");
       return;
     }
 
@@ -65,7 +69,12 @@ export default function ContactClient() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message,
+        }),
       });
 
       const data = await res.json();
@@ -142,7 +151,8 @@ export default function ContactClient() {
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
 
           {/* Honeypot */}
-          <input name="_honey" className="hidden" tabIndex="-1" autoComplete="off" aria-hidden="true" />
+          <input name="_honey" value={formData._honey} onChange={handleChange}
+            className="hidden" tabIndex="-1" autoComplete="off" aria-hidden="true" />
 
           <input type="text" name="name" placeholder="Your Full Name"
             value={formData.name} onChange={handleChange} required autoComplete="name"

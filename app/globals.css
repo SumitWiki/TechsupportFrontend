@@ -9,6 +9,7 @@
 
 html, body {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 @keyframes fadeSlide {
   from {
@@ -37,10 +38,6 @@ html, body {
 
 .animate-fadeIn {
   animation: fadeIn 0.25s ease-in-out;
-}
-
-html, body {
-  overflow-x: hidden;
 }
 
 html {

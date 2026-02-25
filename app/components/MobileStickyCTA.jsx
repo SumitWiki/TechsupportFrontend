@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { PHONE_USA, PHONE_DISPLAY } from "../lib/constants";
 
 export default function MobileStickyCTA() {
@@ -11,13 +12,13 @@ export default function MobileStickyCTA() {
         <span className="text-lg">📞</span>
         <span>Call {PHONE_DISPLAY}</span>
       </a>
-      <a
+      <Link
         href="/contact"
         className="w-1/2 bg-blue-600 text-white text-center py-4 font-semibold text-sm flex flex-col items-center leading-tight"
       >
         <span className="text-lg">🔐</span>
         <span>Secure Session</span>
-      </a>
+      </Link>
     </div>
   );
 }

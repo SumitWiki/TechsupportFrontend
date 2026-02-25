@@ -10,7 +10,9 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/admin/dashboard";
+  const rawFrom = searchParams.get("from") || "/admin/dashboard";
+  // Prevent open redirect — only allow internal /admin/ paths
+  const from = rawFrom.startsWith("/admin/") || rawFrom === "/admin" ? rawFrom : "/admin/dashboard";
 
   const handleLogin = async (e) => {
     e.preventDefault();

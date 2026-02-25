@@ -7,6 +7,8 @@ export default function FeedbackSection() {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = () => {
+    // Log feedback (can be extended to send to API)
+    console.log("Feedback submitted:", { answer, reason });
     setSubmitted(true);
   };
 
@@ -18,7 +20,7 @@ export default function FeedbackSection() {
         </h3>
         <p className="text-sm text-slate-600 mt-2">
           While we are unable to respond directly to your feedback,
-          but we will use this information to improve our online support.
+          we will use this information to improve our online support.
         </p>
       </div>
     );

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { PHONE_USA, PHONE_DISPLAY } from "../lib/constants";
 
 export default function ExitIntentPopup() {
@@ -41,12 +42,12 @@ export default function ExitIntentPopup() {
           📞 Call {PHONE_DISPLAY}
         </a>
 
-        <a
+        <Link
           href="/contact"
           className="block mt-3 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
         >
           🔐 Start Secure Session
-        </a>
+        </Link>
 
         <button
           onClick={handleDismiss}

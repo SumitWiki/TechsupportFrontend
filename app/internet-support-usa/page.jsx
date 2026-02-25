@@ -11,9 +11,18 @@ export const metadata = {
     "WiFi not connecting fix"
   ],
   alternates: {
-    canonical: "https://techsupport4.com/internet-support-usa"
-  }
-
+    canonical: "/internet-support-usa"
+  },
+  openGraph: {
+    title: "Internet Support USA | Remote Internet Fix",
+    description: "Professional remote internet support for USA customers.",
+    url: "https://techsupport4.com/internet-support-usa",
+  },
+  twitter: {
+    card: "summary",
+    title: "Internet Support USA | Remote Internet Fix",
+    description: "Professional remote internet support for USA customers.",
+  },
 };
 
 export default function InternetSupportUSA() {
