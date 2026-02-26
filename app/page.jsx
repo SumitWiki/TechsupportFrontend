@@ -131,8 +131,8 @@ export default function Home() {
                   {/* Agent visual placeholder */}
                   <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
                     <div className="text-center mb-6">
-                      <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-4xl shadow-2xl">
-                        🎧
+                      <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-2xl">
+                        <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 010-7.072m-2.828 9.9a9 9 0 010-12.728" /><circle cx="12" cy="12" r="3" strokeWidth={1.5} /></svg>
                       </div>
                       <h3 className="mt-4 text-xl font-bold">Expert Technician</h3>
                       <p className="text-blue-200/60 text-sm">Ready to help you now</p>
@@ -169,14 +169,14 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-wrap justify-center md:justify-between items-center gap-6 md:gap-4">
               {[
-                { icon: "⭐", label: "4.9/5 Rating", sub: "1,247 Reviews" },
-                { icon: "🔒", label: "256-bit SSL", sub: "Encrypted Sessions" },
-                { icon: "🇺🇸", label: "US Based", sub: "Support Team" },
-                { icon: "⚡", label: "30 Min", sub: "Avg. Resolution" },
-                { icon: "🕐", label: "24/7/365", sub: "Always Available" },
+                { icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z", label: "4.9/5 Rating", sub: "1,247 Reviews", color: "text-yellow-500" },
+                { icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", label: "256-bit SSL", sub: "Encrypted Sessions", color: "text-green-500" },
+                { icon: "M3 21V5a2 2 0 012-2h14a2 2 0 012 2v16l-4-3-4 3-4-3-4 3z", label: "US Based", sub: "Support Team", color: "text-blue-500" },
+                { icon: "M13 10V3L4 14h7v7l9-11h-7z", label: "30 Min", sub: "Avg. Resolution", color: "text-orange-500" },
+                { icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z", label: "24/7/365", sub: "Always Available", color: "text-purple-500" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 text-center md:text-left">
-                  <span className="text-2xl">{item.icon}</span>
+                  <svg className={`w-6 h-6 ${item.color}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} /></svg>
                   <div>
                     <p className="font-bold text-sm text-slate-800 dark:text-white">{item.label}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{item.sub}</p>
@@ -281,15 +281,17 @@ export default function Home() {
 
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { step: "01", title: "Call or Submit", desc: "Reach out via phone or our secure contact form. Describe your issue and we'll match you with the right expert.", icon: "📞" },
-                { step: "02", title: "Secure Connection", desc: "Our certified technician connects to your device through an encrypted remote session. You stay in full control.", icon: "🔐" },
-                { step: "03", title: "Issue Resolved", desc: "Your problem is diagnosed and fixed — typically within 30-60 minutes. No follow-up visit needed.", icon: "✅" },
+                { step: "01", title: "Call or Submit", desc: "Reach out via phone or our secure contact form. Describe your issue and we'll match you with the right expert.", icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" },
+                { step: "02", title: "Secure Connection", desc: "Our certified technician connects to your device through an encrypted remote session. You stay in full control.", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" },
+                { step: "03", title: "Issue Resolved", desc: "Your problem is diagnosed and fixed — typically within 30-60 minutes. No follow-up visit needed.", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
               ].map((item, i) => (
                 <div key={i} className="relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center hover:shadow-lg transition">
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">
                     {item.step}
                   </div>
-                  <div className="text-4xl mb-4 mt-2">{item.icon}</div>
+                  <div className="w-14 h-14 mx-auto mb-4 mt-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                    <svg className="w-7 h-7 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} /></svg>
+                  </div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">{item.title}</h3>
                   <p className="mt-3 text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{item.desc}</p>
                 </div>

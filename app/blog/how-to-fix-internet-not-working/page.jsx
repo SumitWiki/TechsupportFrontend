@@ -37,25 +37,35 @@ export default function BlogPost() {
         }}
       />
 
-      <main className="bg-slate-50 min-h-screen">
+      <main className="bg-slate-50 dark:bg-slate-900 min-h-screen">
         {/* Hero */}
-        <section className="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-14 px-6">
+        <section className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white py-16 md:py-20 px-6">
           <div className="max-w-4xl mx-auto">
-            <p className="text-blue-200 text-sm mb-2">
-              <Link href="/" className="hover:underline">Home</Link> &rsaquo;{" "}
-              <Link href="/blog/how-to-fix-internet-not-working" className="hover:underline">Blog</Link>
-            </p>
-            <h1 className="text-4xl font-bold">How to Fix Internet Not Working</h1>
-            <p className="mt-3 text-blue-100 text-lg">
+            <nav className="flex items-center gap-2 text-blue-300 text-sm mb-6">
+              <Link href="/" className="hover:text-white transition">Home</Link>
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <Link href="/blog" className="hover:text-white transition">Blog</Link>
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <span className="text-white">Internet Fix</span>
+            </nav>
+            <span className="inline-block bg-blue-500/20 text-blue-300 text-xs font-semibold px-3 py-1 rounded-full mb-4 border border-blue-500/30">Troubleshooting Guide</span>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold leading-tight">How to Fix Internet Not Working</h1>
+            <p className="mt-4 text-blue-200 text-lg max-w-2xl">
               A complete troubleshooting guide for USA, UK & Canada customers.
             </p>
+            <div className="flex items-center gap-4 mt-6 text-sm text-blue-300">
+              <span>Updated: Feb 2026</span>
+              <span className="w-1 h-1 rounded-full bg-blue-400"></span>
+              <span>7 min read</span>
+            </div>
           </div>
         </section>
 
         {/* Content */}
-        <article className="max-w-4xl mx-auto px-6 py-14">
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mb-10 text-yellow-800 text-sm">
-            💡 <strong>Quick fix:</strong> Before trying anything else, restart your router and modem — this resolves over 60% of internet issues.
+        <article className="article-content max-w-4xl mx-auto px-6 py-14">
+          <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-400 p-4 rounded-r-lg mb-10 flex items-start gap-3">
+            <svg className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+            <p className="text-amber-800 dark:text-amber-200 text-sm"><strong>Quick fix:</strong> Before trying anything else, restart your router and modem — this resolves over 60% of internet issues.</p>
           </div>
 
           <p className="text-slate-600 text-lg leading-relaxed mb-8">
@@ -128,28 +138,32 @@ export default function BlogPost() {
           </p>
 
           {/* CTA */}
-          <div className="bg-blue-600 text-white rounded-2xl p-8 text-center">
-            <h3 className="text-2xl font-bold">Need Immediate Internet Support?</h3>
-            <p className="mt-2 text-blue-100">Available 24/7 across USA, UK and Canada.</p>
-            <Link
-              href="/contact"
-              className="inline-block mt-6 bg-white text-blue-700 px-8 py-3 rounded-xl font-semibold hover:bg-blue-50 transition"
-            >
-              🔐 Start Secure Remote Session
-            </Link>
+          <div className="bg-gradient-to-br from-blue-700 to-blue-900 text-white rounded-2xl p-8 md:p-10 text-center">
+            <h3 className="text-2xl font-heading font-bold">Need Immediate Internet Support?</h3>
+            <p className="mt-2 text-blue-200 max-w-lg mx-auto">Available 24/7 across USA, UK and Canada. Most issues resolved within 30 minutes.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+              <Link href="/contact" className="inline-flex items-center justify-center gap-2 bg-white text-blue-700 px-8 py-3 rounded-xl font-semibold hover:bg-blue-50 transition">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                Start Secure Session
+              </Link>
+              <a href="tel:+18889501777" className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-red-700 transition">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                Call Now
+              </a>
+            </div>
           </div>
 
           {/* Related */}
           <div className="mt-12">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">Related Guides</h3>
+            <h3 className="text-lg font-heading font-bold text-slate-800 dark:text-white mb-4">Related Guides</h3>
             <div className="grid sm:grid-cols-2 gap-4">
-              <Link href="/blog/printer-offline-fix-guide" className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md transition">
-                <p className="font-semibold text-blue-700">How to Fix Printer Offline</p>
-                <p className="text-slate-500 text-sm mt-1">Step-by-step printer offline fix guide.</p>
+              <Link href="/blog/printer-offline-fix-guide" className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 hover:shadow-md transition group">
+                <p className="font-semibold text-blue-700 dark:text-blue-400 group-hover:text-blue-600">How to Fix Printer Offline</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Step-by-step printer offline fix guide.</p>
               </Link>
-              <Link href="/blog/wifi-router-reset-guide" className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md transition">
-                <p className="font-semibold text-blue-700">How to Reset Your Wi-Fi Router</p>
-                <p className="text-slate-500 text-sm mt-1">Factory reset your router safely.</p>
+              <Link href="/blog/wifi-router-reset-guide" className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 hover:shadow-md transition group">
+                <p className="font-semibold text-blue-700 dark:text-blue-400 group-hover:text-blue-600">How to Reset Your Wi-Fi Router</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Factory reset your router safely.</p>
               </Link>
             </div>
           </div>

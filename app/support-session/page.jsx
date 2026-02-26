@@ -9,37 +9,71 @@ export const metadata = {
 
 export default function SupportSessionPage() {
   return (
-    <main className="max-w-5xl mx-auto px-6 py-16">
+    <main className="bg-slate-50 dark:bg-slate-900 min-h-screen">
+      {/* Hero */}
+      <section className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white py-16 md:py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-500/30">
+            <svg className="w-8 h-8 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold leading-tight">
+            Start Secure Support Session
+          </h1>
+          <p className="mt-4 text-blue-200 text-lg max-w-xl mx-auto">
+            Connect with our certified experts through a safe, encrypted remote session.
+          </p>
+        </div>
+      </section>
 
-      <h1 className="text-4xl font-bold text-center mb-8">
-        Start Secure Support Session
-      </h1>
+      {/* Content */}
+      <section className="max-w-3xl mx-auto px-6 py-16">
+        <div className="bg-white dark:bg-slate-800 p-8 md:p-10 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
+          <h2 className="text-xl font-heading font-bold text-slate-800 dark:text-white mb-6">Before You Begin</h2>
+          <p className="text-slate-600 dark:text-slate-300 text-lg mb-6">
+            Please review the session details below before starting your remote support session.
+          </p>
 
-      <div className="bg-white p-8 rounded-xl shadow space-y-6">
+          <div className="grid sm:grid-cols-2 gap-4 mb-8">
+            {[
+              { icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", title: "Encrypted Connection", desc: "256-bit SSL encryption protects your data" },
+              { icon: "M6 18L18 6M6 6l12 12", title: "End Anytime", desc: "You control the session — disconnect anytime" },
+              { icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title: "Certified Experts", desc: "Trained & verified technical professionals" },
+              { icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z", title: "24/7 Available", desc: "Round-the-clock support, every day" },
+            ].map((item) => (
+              <div key={item.title} className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50">
+                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} /></svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 dark:text-white text-sm">{item.title}</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
 
-        <p className="text-slate-600 text-lg">
-          Before starting your remote support session, please review the
-          session details below.
-        </p>
-
-        <ul className="list-disc pl-6 text-slate-600 space-y-2">
-          <li>Encrypted & secure remote connection</li>
-          <li>You can end session anytime</li>
-          <li>Certified technical expert assistance</li>
-          <li>Support available 24/7</li>
-        </ul>
-
-        <div className="text-center mt-8">
-          <Link
-            href="/contact"
-            className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-          >
-            Continue to Secure Session
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              Continue to Secure Session
+            </Link>
+            <a
+              href="tel:+18889501777"
+              className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-red-700 transition"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+              Or Call Us Directly
+            </a>
+          </div>
         </div>
 
-      </div>
-
+        <p className="text-center text-slate-400 dark:text-slate-500 text-sm mt-6">
+          Your privacy is our priority. No data is stored without your consent.
+        </p>
+      </section>
     </main>
   );
 }
