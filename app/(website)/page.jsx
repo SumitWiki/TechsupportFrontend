@@ -1,6 +1,6 @@
 import Script from "next/script";
 import Link from "next/link";
-import { PHONE_USA, PHONE_DISPLAY } from "./lib/constants";
+import { PHONE_USA, PHONE_DISPLAY } from "../lib/constants";
 
 export const metadata = {
   title: "24/7 USA Tech Support — Instant Help for Router, Printer & Internet | TechSupport4",

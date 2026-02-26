@@ -1,15 +1,15 @@
 import { Inter, Poppins } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import Link from "next/link";
-import DesktopServicesMenu from "./components/DesktopServicesMenu";
-import MobileMenu from "./components/MobileMenu";
-import CookieBanner from "./components/CookieBanner";
-import ExitIntentPopup from "./components/ExitIntentPopup";
-import MobileStickyCTA from "./components/MobileStickyCTA";
-import StickyCallDesktop from "./components/StickyCallDesktop";
-import { PHONE_USA, PHONE_DISPLAY, SUPPORT_EMAIL } from "./lib/constants";
-import ThemeProvider from "./components/ThemeProvider";
-import ThemeToggle from "./components/ThemeToggle";
+import DesktopServicesMenu from "../components/DesktopServicesMenu";
+import MobileMenu from "../components/MobileMenu";
+import CookieBanner from "../components/CookieBanner";
+import ExitIntentPopup from "../components/ExitIntentPopup";
+import MobileStickyCTA from "../components/MobileStickyCTA";
+import StickyCallDesktop from "../components/StickyCallDesktop";
+import { PHONE_USA, PHONE_DISPLAY, SUPPORT_EMAIL } from "../lib/constants";
+import ThemeProvider from "../components/ThemeProvider";
+import ThemeToggle from "../components/ThemeToggle";
 
 export const metadata = {
   title: "24/7 USA Tech Support — Router, Printer & Internet Help | TechSupport4",

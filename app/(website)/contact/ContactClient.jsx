@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PHONE_USA, PHONE_DISPLAY, SUPPORT_EMAIL } from "../lib/constants";
+import { PHONE_USA, PHONE_DISPLAY, SUPPORT_EMAIL } from "../../lib/constants";
 
 export default function ContactClient() {
   const [formData, setFormData] = useState({

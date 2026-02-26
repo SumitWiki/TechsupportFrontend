@@ -1,5 +1,5 @@
-import LegalLayout from "../components/LegalLayout";
-import FeedbackSection from "../components/FeedbackSection";
+import LegalLayout from "../../components/LegalLayout";
+import FeedbackSection from "../../components/FeedbackSection";
 export const metadata = {
   title: "Refund Policy | TechSupport4",
   description:
