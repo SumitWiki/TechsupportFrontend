@@ -117,7 +117,7 @@ export default function Dashboard() {
         const data = await res.json();
         if (!cancelled) setUser(data);
       } catch {
-        if (!cancelled) router.push("/admin/login");
+        if (!cancelled) router.push("/");
       }
     }
     checkAuth();
@@ -139,7 +139,7 @@ export default function Dashboard() {
       });
     } catch { /* ignore — redirect anyway */ }
     localStorage.removeItem("crm_user");
-    router.push("/admin/login");
+    router.push("/");
   };
 
   const exportCSV = () => {

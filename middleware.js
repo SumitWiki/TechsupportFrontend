@@ -9,12 +9,19 @@ export function middleware(request) {
   // CRM Subdomain  →  only /admin
   // ===============================
   if (isCRM) {
+    // If user hits /admin/login directly (or from cached 308), redirect to clean /
+    if (pathname === "/admin/login") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url, 307);
+    }
+    // Root or any non-admin path → silently serve login (URL stays clean)
     if (!pathname.startsWith("/admin")) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin/login";
       return NextResponse.rewrite(url);
     }
-    // Add noindex header to all CRM responses
+    // /admin/dashboard etc → pass through
     const res = NextResponse.next();
     res.headers.set("X-Robots-Tag", "noindex, nofollow");
     return res;
