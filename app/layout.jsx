@@ -1,4 +1,5 @@
 import { Inter, Poppins } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import Link from "next/link";
 import DesktopServicesMenu from "./components/DesktopServicesMenu";
@@ -46,6 +47,9 @@ const poppins = Poppins({
 });
 
 export default function RootLayout({ children }) {
+  const host = headers().get("host") || "";
+  const isCRM = host.startsWith("crm.");
+
   return (
     // <html lang="en" className="scroll-smooth">
     <html
@@ -55,6 +59,8 @@ export default function RootLayout({ children }) {
       <body className="bg-white text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
         <ThemeProvider>
 
+        {!isCRM && (
+<>
         {/* ================= TOP BAR ================= */}
         <div className="hidden md:block bg-slate-900 text-slate-300 text-xs py-2">
           <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
@@ -116,9 +122,15 @@ export default function RootLayout({ children }) {
             </div>
           </div>
         </header>
+        </>
+)}
 
         {/* ================= PAGE CONTENT ================= */}
         {children}
+
+        {!isCRM && (
+<>
+
 
         {/* ================= FOOTER ================= */}
         <footer className="bg-slate-950 text-slate-300">
@@ -224,6 +236,8 @@ export default function RootLayout({ children }) {
         <MobileStickyCTA />
         <StickyCallDesktop />
         <ExitIntentPopup />
+        </>
+)}
         </ThemeProvider>
       </body>
     </html>
