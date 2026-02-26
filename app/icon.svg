@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E40AF"/>
+      <stop offset="100%" stop-color="#1E3A8A"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect x="16" y="16" width="480" height="480" rx="96" ry="96" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="96" ry="96" fill="url(#shine)"/>
+  <!-- Headset icon -->
+  <g transform="translate(256,270)" fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Headband arc -->
+    <path d="M-120,10 C-120,-100 -80,-150 0,-150 C80,-150 120,-100 120,10" fill="none"/>
+    <!-- Left earpiece -->
+    <rect x="-140" y="-10" width="45" height="80" rx="14" fill="#ffffff" stroke="none"/>
+    <!-- Right earpiece -->
+    <rect x="95" y="-10" width="45" height="80" rx="14" fill="#ffffff" stroke="none"/>
+    <!-- Microphone arm -->
+    <path d="M120,50 C120,100 80,120 50,120" stroke="#ffffff" stroke-width="22" fill="none"/>
+    <!-- Mic tip -->
+    <circle cx="42" cy="122" r="16" fill="#ffffff" stroke="none"/>
+  </g>
+  <!-- "4" badge -->
+  <g transform="translate(380,400)">
+    <circle cx="0" cy="0" r="52" fill="#DC2626"/>
+    <text x="0" y="8" text-anchor="middle" dominant-baseline="middle" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="60" fill="#ffffff">4</text>
+  </g>
+</svg>
