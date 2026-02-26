@@ -14,11 +14,11 @@ export default function FeedbackSection() {
 
   if (submitted) {
     return (
-      <div className="mt-10 bg-blue-50 border border-blue-200 p-6 rounded-xl text-center">
-        <h3 className="text-lg font-semibold text-blue-700">
+      <div className="mt-10 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-6 rounded-xl text-center">
+        <h3 className="text-lg font-semibold text-blue-700 dark:text-blue-400">
           Thank you!
         </h3>
-        <p className="text-sm text-slate-600 mt-2">
+        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
           While we are unable to respond directly to your feedback,
           we will use this information to improve our online support.
         </p>
@@ -27,9 +27,9 @@ export default function FeedbackSection() {
   }
 
   return (
-    <div className="mt-12 border-t pt-8">
+    <div className="mt-12 border-t border-slate-200 dark:border-slate-700 pt-8">
 
-      <h3 className="text-lg font-semibold text-slate-800 mb-4">
+      <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">
         Was this information helpful?
       </h3>
 
@@ -60,8 +60,8 @@ export default function FeedbackSection() {
 
       {/* IF YES */}
       {answer === "yes" && (
-        <div className="bg-green-50 border border-green-200 p-5 rounded-lg">
-          <p className="text-green-700 font-medium">
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-5 rounded-lg">
+          <p className="text-green-700 dark:text-green-400 font-medium">
             Thank you for your feedback.
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function FeedbackSection() {
 
       {/* IF NO */}
       {answer === "no" && (
-        <div className="bg-slate-50 border border-slate-200 p-6 rounded-xl animate-fade-in">
+        <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 rounded-xl animate-fadeIn">
 
           <p className="font-medium mb-4 text-slate-700">
             Please select what best describes the issue:

@@ -32,7 +32,7 @@ export default function LegalLayout({
   }, [sections]);
 
   return (
-    <section className="bg-slate-50 dark:bg-slate-900 py-20 print:bg-white">
+    <section className="bg-white dark:bg-slate-900 py-20 print:bg-white">
       <div className="max-w-7xl mx-auto px-6 flex gap-10">
 
         {/* SIDEBAR */}
@@ -72,7 +72,7 @@ export default function LegalLayout({
 
             {/* Header */}
             <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
-              <h1 className="text-3xl font-bold text-blue-700 dark:text-blue-400">
+              <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white" style={{ fontFamily: 'var(--font-heading)' }}>
                 {title}
               </h1>
               <div className="flex items-center gap-3 mt-4 md:mt-0 text-sm">

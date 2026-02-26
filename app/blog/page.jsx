@@ -35,58 +35,56 @@ const posts = [
 ];
 
 const categoryColors = {
-  Internet: "bg-blue-100 text-blue-700",
-  Printer: "bg-purple-100 text-purple-700",
-  "Wi-Fi": "bg-green-100 text-green-700",
+  Internet: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400",
+  Printer: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400",
+  "Wi-Fi": "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400",
 };
 
 export default function BlogIndex() {
   return (
-    <main className="bg-slate-50 min-h-screen">
+    <main className="bg-white dark:bg-slate-900 min-h-screen">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-slate-800 to-blue-900 text-white py-16 text-center px-6">
-        <h1 className="text-4xl font-bold">Tech Support Blog</h1>
-        <p className="mt-3 text-slate-300 max-w-xl mx-auto">
-          Free troubleshooting guides for internet, printer, Wi-Fi and more — written by certified technicians.
-        </p>
+      <section className="relative bg-gradient-to-br from-slate-800 via-slate-900 to-blue-900 text-white py-20 text-center px-6 overflow-hidden">
+        <div className="absolute inset-0 opacity-10"><div className="absolute top-10 right-1/3 w-96 h-96 bg-blue-400 rounded-full blur-3xl"></div></div>
+        <div className="relative z-10">
+          <span className="inline-block px-4 py-1.5 bg-white/10 border border-white/20 rounded-full text-sm font-medium mb-4">Knowledge Base</span>
+          <h1 className="text-4xl md:text-5xl font-extrabold" style={{ fontFamily: 'var(--font-heading)' }}>Tech Support Blog</h1>
+          <p className="mt-3 text-slate-300 max-w-xl mx-auto">Free troubleshooting guides for internet, printer, Wi-Fi and more — written by certified technicians.</p>
+        </div>
       </section>
 
       {/* Posts */}
       <section className="max-w-5xl mx-auto px-6 py-16">
-        <div className="grid gap-8">
+        <div className="grid gap-6">
           {posts.map((post) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="bg-white rounded-2xl shadow-sm border border-slate-100 p-7 hover:shadow-md hover:-translate-y-0.5 transition group"
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-7 hover:shadow-lg hover:-translate-y-0.5 transition group"
             >
               <div className="flex items-center gap-3 mb-3">
-                <span className={`text-xs font-semibold px-3 py-1 rounded-full ${categoryColors[post.category]}`}>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${categoryColors[post.category]}`}>
                   {post.category}
                 </span>
-                <span className="text-xs text-slate-400">{post.readTime}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">{post.readTime}</span>
               </div>
-              <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-700 transition">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
                 {post.title}
               </h2>
-              <p className="mt-2 text-slate-500 leading-relaxed">{post.description}</p>
-              <p className="mt-4 text-blue-600 text-sm font-semibold">Read Guide →</p>
+              <p className="mt-2 text-slate-500 dark:text-slate-400 leading-relaxed text-sm">{post.description}</p>
+              <p className="mt-4 text-blue-600 dark:text-blue-400 text-sm font-bold">Read Guide &rarr;</p>
             </Link>
           ))}
         </div>
 
         {/* CTA */}
-        <div className="mt-14 bg-blue-600 rounded-2xl p-8 text-white text-center">
-          <h2 className="text-2xl font-bold">Issue Not Covered in Our Guides?</h2>
-          <p className="mt-2 text-blue-100">
-            Our certified technicians are available 24/7 to diagnose and fix any tech issue remotely.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-block mt-6 bg-white text-blue-700 px-8 py-3 rounded-xl font-semibold hover:bg-blue-50 transition"
-          >
-            🔐 Get Expert Support
-          </Link>
+        <div className="mt-14 bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-10 text-white text-center">
+          <h2 className="text-2xl font-extrabold" style={{ fontFamily: 'var(--font-heading)' }}>Issue Not Covered in Our Guides?</h2>
+          <p className="mt-2 text-blue-100">Our certified technicians are available 24/7 to diagnose and fix any tech issue remotely.</p>
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
+            <Link href="/contact" className="bg-white text-blue-700 px-8 py-3 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg">Get Expert Support</Link>
+            <a href="tel:+18001234567" className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+          </div>
         </div>
       </section>
     </main>

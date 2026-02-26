@@ -71,36 +71,36 @@ export default function FAQPage() {
         }}
       />
 
-      <main className="bg-slate-50 min-h-screen">
+      <main className="bg-white dark:bg-slate-900 min-h-screen">
         {/* Hero */}
-        <section className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white py-16 text-center px-6">
-          <h1 className="text-4xl font-bold">Frequently Asked Questions</h1>
-          <p className="mt-3 text-blue-100 max-w-xl mx-auto">
-            Everything you need to know about TechSupport4 remote tech support.
-          </p>
+        <section className="relative bg-gradient-to-br from-blue-800 via-blue-700 to-indigo-700 text-white py-20 text-center px-6 overflow-hidden">
+          <div className="absolute inset-0 opacity-10"><div className="absolute top-10 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div></div>
+          <div className="relative z-10">
+            <span className="inline-block px-4 py-1.5 bg-white/10 border border-white/20 rounded-full text-sm font-medium mb-4">Help Center</span>
+            <h1 className="text-4xl md:text-5xl font-extrabold" style={{ fontFamily: 'var(--font-heading)' }}>Frequently Asked Questions</h1>
+            <p className="mt-3 text-blue-100 max-w-xl mx-auto">Everything you need to know about TechSupport4 remote tech support.</p>
+          </div>
         </section>
 
         {/* FAQ Grid */}
         <section className="max-w-4xl mx-auto px-6 py-16">
           <div className="space-y-4">
             {faqs.map(({ q, a }, i) => (
-              <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h2 className="text-lg font-semibold text-slate-800">{q}</h2>
-                <p className="mt-3 text-slate-600 leading-relaxed">{a}</p>
+              <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{q}</h2>
+                <p className="mt-3 text-slate-500 dark:text-slate-400 leading-relaxed text-sm">{a}</p>
               </div>
             ))}
           </div>
 
           {/* CTA */}
-          <div className="mt-12 text-center bg-blue-600 rounded-2xl p-8 text-white">
-            <h2 className="text-2xl font-bold">Still have questions?</h2>
+          <div className="mt-12 text-center bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-10 text-white">
+            <h2 className="text-2xl font-extrabold" style={{ fontFamily: 'var(--font-heading)' }}>Still have questions?</h2>
             <p className="mt-2 text-blue-100">Our team is available 24/7 to help.</p>
-            <a
-              href="/contact"
-              className="inline-block mt-6 bg-white text-blue-700 px-8 py-3 rounded-xl font-semibold hover:bg-blue-50 transition"
-            >
-              Contact Support
-            </a>
+            <div className="flex flex-wrap justify-center gap-4 mt-6">
+              <a href="/contact" className="bg-white text-blue-700 px-8 py-3 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg">Contact Support</a>
+              <a href="tel:+18001234567" className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+            </div>
           </div>
         </section>
       </main>
