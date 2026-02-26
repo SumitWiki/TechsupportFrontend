@@ -103,13 +103,26 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [customerSearch, setCustomerSearch] = useState("");
 
-  /* Auth check */
+  const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+  /* Auth check — verify session via HttpOnly cookie */
   useEffect(() => {
-    const token = localStorage.getItem("crm_token");
-    const stored = localStorage.getItem("crm_user");
-    if (!token) { router.push("/admin/login"); return; }
-    if (stored) setUser(JSON.parse(stored));
-  }, [router]);
+    let cancelled = false;
+    async function checkAuth() {
+      try {
+        const res = await fetch(`${API}/api/auth/me`, {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("unauthorized");
+        const data = await res.json();
+        if (!cancelled) setUser(data);
+      } catch {
+        if (!cancelled) router.push("/admin/login");
+      }
+    }
+    checkAuth();
+    return () => { cancelled = true; };
+  }, [router, API]);
 
   /* Dark mode sync */
   useEffect(() => {
@@ -118,8 +131,13 @@ export default function Dashboard() {
     else root.classList.remove("dark");
   }, [dark]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("crm_token");
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch { /* ignore — redirect anyway */ }
     localStorage.removeItem("crm_user");
     router.push("/admin/login");
   };

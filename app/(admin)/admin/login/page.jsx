@@ -76,20 +76,26 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  /* ─── OTP flow state ─── */
+  const [step, setStep] = useState(1); // 1 = credentials, 2 = OTP
+  const [userId, setUserId] = useState(null);
+  const [otp, setOtp] = useState("");
+
+  const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+  /* ── STEP 1: submit email + password → receive OTP ── */
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/auth/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const res = await fetch(`${API}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
+      });
       const data = await res.json();
 
       if (!res.ok) {
@@ -98,8 +104,41 @@ export default function AdminLogin() {
         return;
       }
 
-      localStorage.setItem("crm_token", data.token);
-      localStorage.setItem("crm_user", JSON.stringify(data.user));
+      // Backend returns { message, userId } — move to OTP step
+      setUserId(data.userId);
+      setStep(2);
+    } catch {
+      setError("Unable to connect to the server");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ── STEP 2: submit OTP → get user + HttpOnly cookie ── */
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API}/api/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, otp }),
+        credentials: "include",
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Invalid or expired OTP");
+        setLoading(false);
+        return;
+      }
+
+      // Store user info for UI (token is in HttpOnly cookie, not accessible to JS)
+      if (data.user) {
+        localStorage.setItem("crm_user", JSON.stringify(data.user));
+      }
       router.push("/admin/dashboard");
     } catch {
       setError("Unable to connect to the server");
@@ -194,10 +233,12 @@ export default function AdminLogin() {
           {/* Header */}
           <div className="mb-8">
             <h2 className="text-[26px] font-bold text-slate-900 tracking-tight" style={{ fontFamily: "var(--font-heading)" }}>
-              Sign in to your account
+              {step === 1 ? "Sign in to your account" : "Verify your identity"}
             </h2>
             <p className="mt-2 text-slate-500 text-[15px]">
-              Access the CRM dashboard to manage your team and leads.
+              {step === 1
+                ? "Access the CRM dashboard to manage your team and leads."
+                : `We sent a 6-digit code to ${email}. Enter it below.`}
             </p>
           </div>
 
@@ -216,6 +257,7 @@ export default function AdminLogin() {
           )}
 
           {/* Form */}
+          {step === 1 ? (
           <form onSubmit={handleLogin} className="space-y-5">
             {/* Email */}
             <div>
@@ -297,7 +339,7 @@ export default function AdminLogin() {
                 </>
               ) : (
                 <>
-                  Sign In
+                  Continue
                   {Icons.arrow("w-4 h-4")}
                 </>
               )}
@@ -309,6 +351,63 @@ export default function AdminLogin() {
               Protected by enterprise-grade encryption
             </p>
           </form>
+          ) : (
+          /* ── STEP 2: OTP FORM ── */
+          <form onSubmit={handleVerifyOtp} className="space-y-5">
+            {/* OTP input */}
+            <div>
+              <label htmlFor="otp" className="block text-sm font-medium text-slate-700 mb-2">
+                Verification Code
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  {Icons.shield("w-[18px] h-[18px] text-slate-400")}
+                </div>
+                <input
+                  id="otp"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  required
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="Enter 6-digit code"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm shadow-sm tracking-[0.3em] text-center font-mono text-lg"
+                />
+              </div>
+              <p className="mt-2 text-xs text-slate-400">Check your email for the verification code.</p>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading || otp.length < 6}
+              className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold text-[15px] transition-all duration-150 flex items-center justify-center gap-2 shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/30"
+            >
+              {loading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  Verify & Sign In
+                  {Icons.check("w-4 h-4")}
+                </>
+              )}
+            </button>
+
+            {/* Back link */}
+            <button
+              type="button"
+              onClick={() => { setStep(1); setOtp(""); setError(""); }}
+              className="w-full text-sm text-slate-500 hover:text-blue-600 transition py-2"
+            >
+              &larr; Back to sign in
+            </button>
+          </form>
+          )}
 
           {/* Footer */}
           <div className="mt-10 pt-6 border-t border-slate-200">
