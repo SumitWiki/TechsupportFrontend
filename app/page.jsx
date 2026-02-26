@@ -59,49 +59,54 @@ export default function Home() {
       <main className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">
 
         {/* ==================== HERO SECTION ==================== */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white">
-          {/* Background pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
-            <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-purple-500 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-          </div>
+        <section className="relative overflow-hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+          {/* Subtle background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-white to-slate-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" />
 
-          <div className="relative max-w-7xl mx-auto px-6 md:px-8 py-20 md:py-32">
+          <div className="relative max-w-7xl mx-auto px-6 md:px-8 py-16 md:py-24">
             <div className="grid md:grid-cols-2 gap-12 items-center">
 
               {/* Left Content */}
-              <div className="animate-fadeSlide">
+              <div>
                 {/* Badge */}
-                <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 mb-6">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  <span className="text-sm text-blue-200 font-medium">Available 24/7 — Technicians Online Now</span>
+                <div className="inline-flex items-center gap-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-full px-4 py-1.5 mb-6">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-sm text-green-700 dark:text-green-400 font-medium">Technicians Online Now — Available 24/7</span>
                 </div>
 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
+                <h1 className="text-4xl md:text-5xl lg:text-[3.25rem] font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white" style={{ fontFamily: 'var(--font-heading)' }}>
                   24/7 USA Tech Support —{" "}
-                  <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                  <span className="text-blue-700 dark:text-blue-400">
                     Instant Help
                   </span>{" "}
                   for Router, Printer & Internet Issues
                 </h1>
 
-                <p className="mt-6 text-lg md:text-xl text-blue-100/80 leading-relaxed max-w-lg">
+                <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-lg">
                   Certified technicians resolve your internet, printer, Wi-Fi & smart TV problems remotely — fast, secure, and hassle-free.
                 </p>
 
+                {/* Large Phone Number */}
+                <div className="mt-8 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 inline-block">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold mb-1">Call Us Toll-Free</p>
+                  <a href={`tel:${PHONE_USA}`} className="text-3xl md:text-4xl font-extrabold text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition" style={{ fontFamily: 'var(--font-heading)' }}>
+                    {PHONE_DISPLAY}
+                  </a>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">No fix, no fee — satisfaction guaranteed</p>
+                </div>
+
                 {/* CTA Buttons */}
-                <div className="mt-8 flex flex-col sm:flex-row gap-4">
+                <div className="mt-6 flex flex-col sm:flex-row gap-4">
                   <a
                     href={`tel:${PHONE_USA}`}
-                    className="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-pulse-glow"
+                    className="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                     Call Now: {PHONE_DISPLAY}
                   </a>
                   <Link
                     href="/contact"
-                    className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur border border-white/20 hover:bg-white/20 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300"
+                    className="inline-flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                     Start Secure Session
@@ -109,52 +114,51 @@ export default function Home() {
                 </div>
 
                 {/* Trust signals */}
-                <div className="mt-8 flex flex-wrap gap-6 text-sm text-blue-200/70">
+                <div className="mt-6 flex flex-wrap gap-6 text-sm text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                     256-bit Encrypted
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                     Certified Experts
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                    Satisfaction Guaranteed
+                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                    No Fix, No Fee
                   </span>
                 </div>
               </div>
 
               {/* Right — Stats / Visual */}
-              <div className="hidden md:block animate-slideInRight">
+              <div className="hidden md:block">
                 <div className="relative">
-                  {/* Agent visual placeholder */}
-                  <div className="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
+                  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-sm">
                     <div className="text-center mb-6">
-                      <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-2xl">
+                      <div className="w-24 h-24 mx-auto bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-lg">
                         <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 010-7.072m-2.828 9.9a9 9 0 010-12.728" /><circle cx="12" cy="12" r="3" strokeWidth={1.5} /></svg>
                       </div>
-                      <h3 className="mt-4 text-xl font-bold">Expert Technician</h3>
-                      <p className="text-blue-200/60 text-sm">Ready to help you now</p>
+                      <h3 className="mt-4 text-xl font-bold text-slate-900 dark:text-white">Expert Technician</h3>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm">Ready to help you now</p>
                     </div>
 
                     {/* Quick stats */}
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
-                        <p className="text-3xl font-extrabold text-white">30</p>
-                        <p className="text-xs text-blue-200/60 mt-1">Min Avg. Fix Time</p>
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-center border border-slate-100 dark:border-slate-700">
+                        <p className="text-3xl font-extrabold text-blue-700 dark:text-blue-400">30</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Min Avg. Fix Time</p>
                       </div>
-                      <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
-                        <p className="text-3xl font-extrabold text-white">4.9</p>
-                        <p className="text-xs text-blue-200/60 mt-1">Customer Rating</p>
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-center border border-slate-100 dark:border-slate-700">
+                        <p className="text-3xl font-extrabold text-blue-700 dark:text-blue-400">4.9</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Customer Rating</p>
                       </div>
-                      <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
-                        <p className="text-3xl font-extrabold text-white">1K+</p>
-                        <p className="text-xs text-blue-200/60 mt-1">Happy Customers</p>
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-center border border-slate-100 dark:border-slate-700">
+                        <p className="text-3xl font-extrabold text-blue-700 dark:text-blue-400">1K+</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Happy Customers</p>
                       </div>
-                      <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
-                        <p className="text-3xl font-extrabold text-white">24/7</p>
-                        <p className="text-xs text-blue-200/60 mt-1">Availability</p>
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-center border border-slate-100 dark:border-slate-700">
+                        <p className="text-3xl font-extrabold text-blue-700 dark:text-blue-400">24/7</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Availability</p>
                       </div>
                     </div>
                   </div>
@@ -242,7 +246,7 @@ export default function Home() {
                 <a
                   key={i}
                   href={service.link}
-                  className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden"
+                  className="group relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 hover:shadow-lg transition-all duration-200 overflow-hidden"
                 >
                   {/* Top gradient bar */}
                   <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${service.gradient}`} />
@@ -275,15 +279,16 @@ export default function Home() {
                 How It Works
               </h2>
               <p className="mt-4 text-slate-500 dark:text-slate-400 text-lg">
-                Get your issue fixed in three easy steps.
+                Get your issue fixed in four easy steps — pay only after it&apos;s resolved.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { step: "01", title: "Call or Submit", desc: "Reach out via phone or our secure contact form. Describe your issue and we'll match you with the right expert.", icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" },
-                { step: "02", title: "Secure Connection", desc: "Our certified technician connects to your device through an encrypted remote session. You stay in full control.", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" },
-                { step: "03", title: "Issue Resolved", desc: "Your problem is diagnosed and fixed — typically within 30-60 minutes. No follow-up visit needed.", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
+                { step: "01", title: "Call Us", desc: "Reach out via our toll-free number or secure contact form. Tell us about your issue.", icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" },
+                { step: "02", title: "Connect Securely", desc: "Our certified technician connects to your device via an encrypted remote session. You stay in control.", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" },
+                { step: "03", title: "Fix Issue", desc: "Your problem is diagnosed and resolved — typically within 30-60 minutes. No follow-up visit needed.", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" },
+                { step: "04", title: "Pay After Fix", desc: "Only pay once you're satisfied with the resolution. No fix, no fee — that's our guarantee.", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
               ].map((item, i) => (
                 <div key={i} className="relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center hover:shadow-lg transition">
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">
@@ -364,7 +369,7 @@ export default function Home() {
                   color: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
                 },
               ].map((item, i) => (
-                <div key={i} className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-7 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <div key={i} className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-7 hover:shadow-md transition-all duration-200">
                   <div className={`inline-flex p-3 rounded-xl ${item.color} mb-4`}>
                     {item.icon}
                   </div>
@@ -372,6 +377,55 @@ export default function Home() {
                   <p className="mt-3 text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ==================== SECURITY & GUARANTEE ==================== */}
+        <section className="py-16 md:py-20 bg-blue-50 dark:bg-slate-900 border-t border-blue-100 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Your Safety Matters</p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white" style={{ fontFamily: 'var(--font-heading)' }}>
+                Our Guarantee to You
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* No Fix No Fee */}
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-5 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center">
+                  <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Fix, No Fee</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">If we can&apos;t resolve your issue, you don&apos;t pay. It&apos;s that simple — zero risk to you.</p>
+              </div>
+
+              {/* Certified Technicians */}
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-5 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center">
+                  <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Certified Technicians</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">Our support team holds industry-recognized certifications with years of hands-on experience.</p>
+              </div>
+
+              {/* Secure Remote Session */}
+              <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-5 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center">
+                  <svg className="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Secure Remote Session</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">256-bit encrypted connections. You grant access and stay in full control throughout.</p>
+              </div>
+            </div>
+
+            {/* Business Address Trust Line */}
+            <div className="mt-10 text-center">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                <svg className="w-4 h-4 inline-block mr-1 -mt-0.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                Business Address: 251 Little Falls Drive, Wilmington, DE 19808, United States
+              </p>
             </div>
           </div>
         </section>

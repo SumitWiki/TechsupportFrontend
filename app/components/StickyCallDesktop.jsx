@@ -13,10 +13,9 @@ export default function StickyCallDesktop() {
         hidden md:flex fixed top-28 right-6 z-40
         items-center gap-2
         bg-red-600 text-white px-5 py-3 rounded-full
-        font-bold text-sm shadow-xl
-        hover:bg-red-700 hover:shadow-2xl hover:scale-105
-        transition-all duration-300
-        animate-pulse-glow
+        font-bold text-sm shadow-lg
+        hover:bg-red-700 hover:shadow-xl
+        transition-all duration-200
       "
       aria-label={`Call ${PHONE_DISPLAY}`}
     >
