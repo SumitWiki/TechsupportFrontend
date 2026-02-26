@@ -184,9 +184,20 @@ export default function Dashboard() {
   /* ── Profile dropdown ── */
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-  /* ── api helper ── */
+  /* ── api helper with automatic token refresh ── */
   const api = useCallback(async (path, opts = {}) => {
-    const res = await fetch(`${API}${path}`, { credentials: "include", ...opts, headers: { "Content-Type": "application/json", ...opts.headers } });
+    const doFetch = () => fetch(`${API}${path}`, { credentials: "include", ...opts, headers: { "Content-Type": "application/json", ...opts.headers } });
+    let res = await doFetch();
+    // If access token expired, try silent refresh then retry once
+    if (res.status === 401) {
+      const body = await res.clone().json().catch(() => ({}));
+      if (body.code === "TOKEN_EXPIRED") {
+        const refreshRes = await fetch(`${API}/api/auth/refresh`, { method: "POST", credentials: "include" });
+        if (refreshRes.ok) {
+          res = await doFetch();
+        }
+      }
+    }
     return res;
   }, [API]);
 

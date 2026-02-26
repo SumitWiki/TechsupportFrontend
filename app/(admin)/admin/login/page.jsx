@@ -135,10 +135,8 @@ export default function AdminLogin() {
         return;
       }
 
-      // Store user info for UI (token is in HttpOnly cookie, not accessible to JS)
-      if (data.user) {
-        localStorage.setItem("crm_user", JSON.stringify(data.user));
-      }
+      // Success — tokens set as HttpOnly cookies by backend
+      // No localStorage needed — dashboard fetches user from /me
       router.push("/admin/dashboard");
     } catch {
       setError("Unable to connect to the server");
