@@ -12,7 +12,7 @@ export function middleware(request) {
     if (!pathname.startsWith("/admin")) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin/login";
-      return NextResponse.redirect(url, 308);
+      return NextResponse.rewrite(url);
     }
     // Add noindex header to all CRM responses
     const res = NextResponse.next();
