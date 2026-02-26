@@ -1,16 +1,38 @@
 import { NextResponse } from "next/server";
 
-/**
- * Next.js Middleware — runs on every request BEFORE the page renders.
- *
- * Admin routes are served directly within this app.
- * Authentication is handled at the page / API level.
- */
-
 export function middleware(request) {
+  const host = request.headers.get("host") || "";
+  const pathname = request.nextUrl.pathname;
+
+  const isCRM = host.startsWith("crm.");
+
+  // ===============================
+  // If CRM Domain
+  // ===============================
+  if (isCRM) {
+    // Allow only /admin routes
+    if (!pathname.startsWith("/admin")) {
+      return NextResponse.redirect(
+        new URL("/admin/login", request.url)
+      );
+    }
+  }
+
+  // ===============================
+  // If Main Website Domain
+  // ===============================
+  if (!isCRM) {
+    // Block /admin on main site
+    if (pathname.startsWith("/admin")) {
+      return NextResponse.redirect(
+        new URL("/", request.url)
+      );
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/:path*"], // apply to all routes
 };
