@@ -119,9 +119,9 @@ export default function AdminLogin() {
       {/* ========== LEFT — BRAND PANEL ========== */}
       <div className="hidden lg:flex lg:w-[520px] xl:w-[560px] flex-col justify-between bg-gradient-to-b from-blue-600 via-blue-700 to-indigo-800 text-white p-12 relative overflow-hidden">
         {/* Decorative circles */}
-        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-white/5" />
-        <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-white/5" />
-        <div className="absolute top-1/2 right-8 w-32 h-32 rounded-full bg-white/[0.03]" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-white/[0.03]" />
+        <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-white/[0.03]" />
+        <div className="absolute top-1/2 right-8 w-32 h-32 rounded-full bg-white/[0.02]" />
 
         {/* Top — Logo & Brand */}
         <div className="relative z-10">
@@ -181,7 +181,8 @@ export default function AdminLogin() {
 
       {/* ========== RIGHT — LOGIN FORM ========== */}
       <div className="flex-1 flex items-center justify-center p-6 md:p-12 bg-slate-50/50">
-        <div className="w-full max-w-[420px]">
+        <div className="w-full max-w-[420px] animate-[fadeUp_0.4s_ease-out_both]">
+          <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}`}</style>
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-12">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
@@ -287,7 +288,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold text-sm transition-all duration-150 flex items-center justify-center gap-2 shadow-sm shadow-blue-600/25 hover:shadow-md hover:shadow-blue-600/30"
+              className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold text-[15px] transition-all duration-150 flex items-center justify-center gap-2 shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/30"
             >
               {loading ? (
                 <>
@@ -301,6 +302,12 @@ export default function AdminLogin() {
                 </>
               )}
             </button>
+
+            {/* Security line */}
+            <p className="text-center text-[11px] text-slate-400 mt-3 flex items-center justify-center gap-1.5">
+              {Icons.lock("w-3 h-3")}
+              Protected by enterprise-grade encryption
+            </p>
           </form>
 
           {/* Footer */}
