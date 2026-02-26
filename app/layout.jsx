@@ -1,3 +1,4 @@
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import DesktopServicesMenu from "./components/DesktopServicesMenu";
@@ -33,10 +34,24 @@ export const metadata = {
     images: ["/logo.png"],
   },
 };
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["600", "700", "800", "900"],
+  variable: "--font-heading",
+});
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    // <html lang="en" className="scroll-smooth">
+    <html
+  lang="en"
+  className={`${inter.variable} ${poppins.variable} scroll-smooth`}
+>
       <body className="bg-white text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
         <ThemeProvider>
 
