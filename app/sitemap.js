@@ -28,6 +28,16 @@ export default function sitemap() {
     "how-to-fix-internet-not-working",
     "printer-offline-fix-guide",
     "wifi-router-reset-guide",
+    "router-not-working-fixes",
+    "hp-printer-offline-windows-11",
+    "wifi-connected-no-internet",
+    "outlook-not-sending-emails",
+    "laptop-running-slow",
+    "canon-printer-not-printing",
+    "network-adapter-not-working",
+    "email-login-problems",
+    "remove-virus-from-pc",
+    "blue-screen-error-fix",
   ];
 
   // Blog index

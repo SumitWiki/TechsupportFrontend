@@ -3,9 +3,9 @@ import Link from "next/link";
 import { PHONE_USA, PHONE_DISPLAY } from "../lib/constants";
 
 export const metadata = {
-  title: "24/7 USA Tech Support — Instant Help for Router, Printer & Internet | TechSupport4",
+  title: "24/7 USA Tech Support | Router, Printer & Email Troubleshooting Experts",
   description:
-    "Certified remote technical support for Internet, Printer, Wi-Fi Router & Smart TV issues across USA, UK & Canada. Call now for instant resolution.",
+    "Get fast and reliable 24/7 USA tech support for router issues, printer problems, email errors, and computer troubleshooting. Step-by-step guides and expert help.",
 };
 
 export default function Home() {

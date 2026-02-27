@@ -44,12 +44,96 @@ const posts = [
     category: "Wi-Fi",
     readTime: "6 min read",
   },
+  {
+    slug: "router-not-working-fixes",
+    title: "Router Not Working? 9 Easy Fixes",
+    description:
+      "Router not working or internet keeps dropping? 9 easy troubleshooting steps to get your connection back in minutes.",
+    category: "Wi-Fi",
+    readTime: "9 min read",
+  },
+  {
+    slug: "hp-printer-offline-windows-11",
+    title: "HP Printer Offline on Windows 11? Step-by-Step Fix",
+    description:
+      "Fix HP printer showing offline on Windows 11 with our 9-step guide covering spooler restart, driver update, and SNMP settings.",
+    category: "Printer",
+    readTime: "8 min read",
+  },
+  {
+    slug: "wifi-connected-no-internet",
+    title: "WiFi Connected But No Internet? Quick Solutions",
+    description:
+      "WiFi connected but no internet access? 9 proven solutions for Windows, Mac, iPhone, and Android devices.",
+    category: "Wi-Fi",
+    readTime: "9 min read",
+  },
+  {
+    slug: "outlook-not-sending-emails",
+    title: "Outlook Not Sending Emails? Fix It in Minutes",
+    description:
+      "Outlook stuck on sending? Fix Outbox errors, SMTP settings, and send/receive failures with our step-by-step guide.",
+    category: "Email",
+    readTime: "8 min read",
+  },
+  {
+    slug: "laptop-running-slow",
+    title: "Laptop Running Slow? 10 Proven Speed Boost Tips",
+    description:
+      "Speed up your slow laptop with 10 proven tips — disable startup apps, upgrade to SSD, clean malware, and optimize Windows.",
+    category: "Computer",
+    readTime: "9 min read",
+  },
+  {
+    slug: "canon-printer-not-printing",
+    title: "Canon Printer Not Printing? Troubleshooting Guide",
+    description:
+      "Fix Canon printer not printing with 8 steps covering ink checks, print head cleaning, driver updates, and error codes.",
+    category: "Printer",
+    readTime: "8 min read",
+  },
+  {
+    slug: "network-adapter-not-working",
+    title: "How to Fix Network Adapter Not Working (Windows 10/11)",
+    description:
+      "Fix network adapter issues on Windows 10 and 11 — enable adapter, update drivers, reset TCP/IP, and restore connectivity.",
+    category: "Network",
+    readTime: "8 min read",
+  },
+  {
+    slug: "email-login-problems",
+    title: "Email Login Problems? Reset & Security Fix Guide",
+    description:
+      "Can't log into Gmail, Outlook, or Yahoo? Step-by-step password reset, 2FA recovery, and account security guide.",
+    category: "Email",
+    readTime: "8 min read",
+  },
+  {
+    slug: "remove-virus-from-pc",
+    title: "How to Remove Virus From PC Safely (Beginner Guide)",
+    description:
+      "Remove viruses, malware, and spyware from your Windows PC safely with Windows Defender, Malwarebytes, and manual cleanup.",
+    category: "Security",
+    readTime: "10 min read",
+  },
+  {
+    slug: "blue-screen-error-fix",
+    title: "How to Fix Blue Screen Error in Windows (BSOD Guide)",
+    description:
+      "Fix the Blue Screen of Death on Windows 10 and 11 — common stop codes, driver fixes, SFC/DISM commands, and memory diagnostics.",
+    category: "Computer",
+    readTime: "10 min read",
+  },
 ];
 
 const categoryColors = {
   Internet: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400",
   Printer: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400",
   "Wi-Fi": "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400",
+  Email: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400",
+  Computer: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400",
+  Network: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400",
+  Security: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
 };
 
 export default function BlogIndex() {

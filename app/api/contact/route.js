@@ -203,7 +203,7 @@ export async function POST(request) {
             <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
               <tr>
                 <td style="background:#2563eb;border-radius:8px;padding:12px 28px;text-align:center;">
-                  <a href="tel:${process.env.NEXT_PUBLIC_PHONE_USA || "+18005551234"}" style="color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;">
+                  <a href="tel:${process.env.NEXT_PUBLIC_PHONE_USA || "+18889501777"}" style="color:#ffffff;text-decoration:none;font-weight:700;font-size:16px;">
                     📞 Call USA: ${process.env.NEXT_PUBLIC_PHONE_DISPLAY || "1-800-555-1234"}
                   </a>
                 </td>
