@@ -194,16 +194,16 @@ export default function Dashboard() {
   const api = useCallback(async (path, opts = {}) => {
     const doFetch = () => fetch(`${API}${path}`, { credentials: "include", ...opts, headers: { "Content-Type": "application/json", ...opts.headers } });
     let res = await doFetch();
-    // On any 401, try silent refresh (skip for auth refresh/login to avoid loops)
-    if (res.status === 401 && path !== "/api/auth/refresh") {
-      // Deduplicate concurrent refresh calls — only one at a time
+    // On any 401, try silent refresh first — NEVER auto-logout without trying refresh
+    if (res.status === 401 && path !== "/api/auth/refresh" && path !== "/api/auth/login" && path !== "/api/auth/verify-otp") {
+      // Deduplicate: all concurrent 401s share a single refresh call
       if (!refreshLock.current) {
         refreshLock.current = fetch(`${API}/api/auth/refresh`, { method: "POST", credentials: "include" })
           .then(r => r.ok)
-          .catch(() => false)
-          .finally(() => { refreshLock.current = null; });
+          .catch(() => false);
       }
       const refreshed = await refreshLock.current;
+      refreshLock.current = null; // clear after ALL waiters resolved
       if (refreshed) {
         res = await doFetch(); // retry with new access token cookie
       }
@@ -211,15 +211,18 @@ export default function Dashboard() {
     return res;
   }, [API]);
 
-  /* ── Auth check ── */
+  /* ── Auth check — tries refresh before logout ── */
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const res = await api("/api/auth/me");
-        if (!res.ok) throw new Error("unauthorized");
+        if (!res.ok) {
+          // api() already tried refresh on 401. If still not ok, truly unauthorized.
+          throw new Error("unauthorized");
+        }
         const data = await res.json();
-        if (!cancelled) setUser(data);
+        if (!cancelled) { setUser(data); setLoading(false); }
       } catch {
         if (!cancelled) router.push("/admin/login");
       }
