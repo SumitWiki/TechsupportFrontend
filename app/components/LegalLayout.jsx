@@ -85,37 +85,47 @@ export default function LegalLayout({
               </div>
             </div>
 
-            {/* Accordion Sections */}
+            {/* Content Sections — semantic h2 headings, always visible to crawlers */}
             {sections.map((section) => (
               <div
                 key={section.id}
                 id={section.id}
                 className="mb-6 border border-slate-200 dark:border-slate-600 rounded-lg overflow-hidden scroll-mt-32"
               >
-                <button
+                <h2
+                  role="button"
+                  tabIndex={0}
                   onClick={() =>
                     setOpenSection(
                       openSection === section.id ? null : section.id
                     )
                   }
-                  className="cursor-pointer w-full text-left p-5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition font-semibold text-slate-800 dark:text-white flex justify-between items-center"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setOpenSection(openSection === section.id ? null : section.id);
+                    }
+                  }}
+                  className="cursor-pointer w-full text-left p-5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition font-semibold text-slate-800 dark:text-white flex justify-between items-center text-base m-0"
                 >
                   {section.title}
-                  <span className="text-slate-500 dark:text-slate-300 text-xl leading-none ml-4 flex-shrink-0">
+                  <span className="text-slate-500 dark:text-slate-300 text-xl leading-none ml-4 flex-shrink-0" aria-hidden="true">
                     {openSection === section.id ? "−" : "+"}
                   </span>
-                </button>
+                </h2>
 
+                {/* Content always in DOM for crawlers, visually toggled */}
                 <div
                   className={`transition-all duration-500 overflow-hidden ${
                     openSection === section.id
-                      ? "max-h-[500px] p-6 bg-white dark:bg-slate-800"
+                      ? "max-h-[2000px] p-6 bg-white dark:bg-slate-800"
                       : "max-h-0"
                   }`}
+                  aria-hidden={openSection !== section.id}
                 >
-                  <p className="text-slate-700 dark:text-slate-200 leading-relaxed">
+                  <div className="text-slate-700 dark:text-slate-200 leading-relaxed">
                     {section.content}
-                  </p>
+                  </div>
                 </div>
               </div>
             ))}

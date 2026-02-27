@@ -61,7 +61,7 @@ export default function WifiRouterSupportUSA() {
               <p className="mt-4 text-lg text-green-100 max-w-xl">Slow Wi-Fi, router disconnecting, or setup issues? Get secure remote network support from certified specialists.</p>
               <div className="flex flex-wrap gap-4 mt-8">
                 <Link href="/contact" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Get Wi-Fi Support Now</Link>
-                <a href="tel:+18001234567" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
+                <a href="tel:+18889501777" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
               </div>
             </div>
             <div className="hidden md:flex justify-center">
@@ -108,8 +108,21 @@ export default function WifiRouterSupportUSA() {
           <p className="mt-3 text-green-100 max-w-xl mx-auto">Get stable &amp; secure internet today. Available 24/7, 365 days.</p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <Link href="/contact" className="bg-white text-green-700 px-8 py-3.5 rounded-xl font-bold hover:bg-green-50 transition shadow-lg">Get Wi-Fi Support</Link>
-            <a href="tel:+18001234567" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+            <a href="tel:+18889501777" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
           </div>
+        </div>
+      </section>
+
+      {/* Internal Links */}
+      <section className="max-w-5xl mx-auto px-6 py-12 border-t border-slate-200 dark:border-slate-700">
+        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Related Services & Resources</h3>
+        <div className="flex flex-wrap gap-4">
+          <Link href="/internet-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Internet Support</Link>
+          <Link href="/printer-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Printer Support</Link>
+          <Link href="/smart-tv-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Smart TV Support</Link>
+          <Link href="/blog/wifi-router-reset-guide" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Guide: Reset Your Router</Link>
+          <Link href="/faq" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">FAQ</Link>
+          <Link href="/about" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">About Us</Link>
         </div>
       </section>
     </main>

@@ -6,7 +6,13 @@ export const metadata = {
   description:
     "Remote internet troubleshooting & router setup services across California.",
   alternates: {
-    canonical: "https://techsupport4.com/internet-support-california",
+    canonical: "/location/internet-support-california",
+  },
+  openGraph: {
+    title: "Internet Support California | Remote WiFi Help",
+    description: "Remote internet troubleshooting & router setup services across California.",
+    url: "https://techsupport4.com/location/internet-support-california",
+    type: "website",
   },
 };
 

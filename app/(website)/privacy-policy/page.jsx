@@ -3,7 +3,8 @@ import LegalLayout from "../../components/LegalLayout";
 export const metadata = {
   title: "Privacy Policy | TechSupport4",
   description:
-    "Enterprise-level privacy policy for TechSupport4 remote technical support services.",
+    "Enterprise-level privacy policy for TechSupport4 remote technical support services. Learn how we collect, use, and protect your personal data.",
+  alternates: { canonical: "/privacy-policy" },
 };
 
 export default function PrivacyPolicyPage() {

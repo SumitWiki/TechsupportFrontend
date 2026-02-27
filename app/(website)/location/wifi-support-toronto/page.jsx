@@ -6,7 +6,13 @@ export const metadata = {
   description:
     "Secure remote WiFi and router troubleshooting services in Toronto, Canada.",
   alternates: {
-    canonical: "https://techsupport4.com/wifi-support-toronto",
+    canonical: "/location/wifi-support-toronto",
+  },
+  openGraph: {
+    title: "WiFi Support Toronto | Router Help Canada",
+    description: "Secure remote WiFi and router troubleshooting services in Toronto, Canada.",
+    url: "https://techsupport4.com/location/wifi-support-toronto",
+    type: "website",
   },
 };
 

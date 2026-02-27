@@ -1,4 +1,5 @@
 import Script from "next/script";
+import Link from "next/link";
 
 export const metadata = {
   title: "Internet Support USA | Remote Internet Fix",
@@ -106,7 +107,7 @@ export default function InternetSupportUSA() {
               </p>
               <div className="flex flex-wrap gap-4 mt-8">
                 <a href="/contact" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Get Help Now</a>
-                <a href="tel:+18001234567" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
+                <a href="tel:+18889501777" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
               </div>
             </div>
             <div className="hidden md:flex justify-center">
@@ -176,8 +177,22 @@ export default function InternetSupportUSA() {
           <p className="mt-3 text-blue-100 max-w-xl mx-auto">Talk to a certified technician now. Available 24/7, 365 days a year.</p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <a href="/contact" className="bg-white text-blue-700 px-8 py-3.5 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg">Get Help Now</a>
-            <a href="tel:+18001234567" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+            <a href="tel:+18889501777" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
           </div>
+        </div>
+      </section>
+
+      {/* Internal Links */}
+      <section className="max-w-5xl mx-auto px-6 py-12 border-t border-slate-200 dark:border-slate-700">
+        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Related Services & Resources</h3>
+        <div className="flex flex-wrap gap-4">
+          <Link href="/wifi-router-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Wi-Fi & Router Support</Link>
+          <Link href="/printer-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Printer Support</Link>
+          <Link href="/smart-tv-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Smart TV Support</Link>
+          <Link href="/blog/how-to-fix-internet-not-working" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Guide: Fix Internet Not Working</Link>
+          <Link href="/blog/wifi-router-reset-guide" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Guide: Reset Your Router</Link>
+          <Link href="/faq" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">FAQ</Link>
+          <Link href="/about" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">About Us</Link>
         </div>
       </section>
 

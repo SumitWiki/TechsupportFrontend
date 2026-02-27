@@ -4,7 +4,7 @@ export const metadata = {
   description:
     "Remote printer support for USA customers. Fix printer offline, driver errors, Wi-Fi printer issues securely.",
 alternates: {
-    canonical: "https://techsupport4.com/printer-support-usa",
+    canonical: "/printer-support-usa",
   },
   openGraph: {
     title: "Printer Support USA | TechSupport4",
@@ -101,7 +101,7 @@ export default function PrinterSupportUSA() {
               </p>
               <div className="flex flex-wrap gap-4 mt-8">
                 <a href="/contact" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Get Help Now</a>
-                <a href="tel:+18001234567" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
+                <a href="tel:+18889501777" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
               </div>
             </div>
             <div className="hidden md:flex justify-center">
@@ -148,8 +148,21 @@ export default function PrinterSupportUSA() {
           <p className="mt-3 text-purple-100 max-w-xl mx-auto">Talk to a printer expert instantly. Available 24/7.</p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <a href="/contact" className="bg-white text-purple-700 px-8 py-3.5 rounded-xl font-bold hover:bg-purple-50 transition shadow-lg">Get Printer Support</a>
-            <a href="tel:+18001234567" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+            <a href="tel:+18889501777" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
           </div>
+        </div>
+      </section>
+
+      {/* Internal Links */}
+      <section className="max-w-5xl mx-auto px-6 py-12 border-t border-slate-200 dark:border-slate-700">
+        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Related Services & Resources</h3>
+        <div className="flex flex-wrap gap-4">
+          <a href="/internet-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Internet Support</a>
+          <a href="/wifi-router-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Wi-Fi & Router Support</a>
+          <a href="/smart-tv-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Smart TV Support</a>
+          <a href="/blog/printer-offline-fix-guide" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Guide: Fix Printer Offline</a>
+          <a href="/faq" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">FAQ</a>
+          <a href="/about" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">About Us</a>
         </div>
       </section>
 

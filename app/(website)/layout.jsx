@@ -1,6 +1,7 @@
 import { Inter, Poppins } from "next/font/google";
 import "../globals.css";
 import Link from "next/link";
+import Script from "next/script";
 import DesktopServicesMenu from "../components/DesktopServicesMenu";
 import MobileMenu from "../components/MobileMenu";
 import CookieBanner from "../components/CookieBanner";
@@ -54,6 +55,45 @@ export default function RootLayout({ children }) {
 >
       <body className="bg-white text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
         <ThemeProvider>
+
+        {/* Global Organization Schema */}
+        <Script
+          id="global-org-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "TechSupport4",
+              url: "https://techsupport4.com",
+              logo: "https://techsupport4.com/logo.png",
+              description: "Certified remote technical support for Internet, Printer, Wi-Fi Router, and Smart TV issues across USA, UK, and Canada.",
+              email: "support@techsupport4.com",
+              telephone: PHONE_USA,
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "251 Little Falls Drive",
+                addressLocality: "Wilmington",
+                addressRegion: "DE",
+                postalCode: "19808",
+                addressCountry: "US",
+              },
+              areaServed: [
+                { "@type": "Country", name: "United States" },
+                { "@type": "Country", name: "United Kingdom" },
+                { "@type": "Country", name: "Canada" },
+              ],
+              contactPoint: {
+                "@type": "ContactPoint",
+                telephone: PHONE_USA,
+                contactType: "customer service",
+                availableLanguage: "English",
+                areaServed: ["US", "GB", "CA"],
+              },
+              sameAs: [],
+            }),
+          }}
+        />
 
         {/* ================= TOP BAR ================= */}
         <div className="hidden md:block bg-slate-900 text-slate-300 text-xs py-2">
@@ -186,6 +226,7 @@ export default function RootLayout({ children }) {
               <div>
                 <p className="font-semibold text-white mb-4 text-xs uppercase tracking-widest">Company</p>
                 <ul className="space-y-2.5 text-sm text-slate-400">
+                  <li><a href="/about" className="hover:text-white transition">About Us</a></li>
                   <li><a href="/faq" className="hover:text-white transition">FAQ</a></li>
                   <li><a href="/blog" className="hover:text-white transition">Blog</a></li>
                   <li><a href="/support-session" className="hover:text-white transition">Start Session</a></li>

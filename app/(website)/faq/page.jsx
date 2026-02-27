@@ -99,7 +99,20 @@ export default function FAQPage() {
             <p className="mt-2 text-blue-100">Our team is available 24/7 to help.</p>
             <div className="flex flex-wrap justify-center gap-4 mt-6">
               <a href="/contact" className="bg-white text-blue-700 px-8 py-3 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg">Contact Support</a>
-              <a href="tel:+18001234567" className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+              <a href="tel:+18889501777" className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+            </div>
+          </div>
+
+          {/* Internal Links */}
+          <div className="mt-10 border-t border-slate-200 dark:border-slate-700 pt-8">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Explore Our Services</h3>
+            <div className="flex flex-wrap gap-4">
+              <a href="/internet-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Internet Support</a>
+              <a href="/printer-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Printer Support</a>
+              <a href="/wifi-router-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Wi-Fi Router Support</a>
+              <a href="/smart-tv-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Smart TV Support</a>
+              <a href="/blog" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Blog Guides</a>
+              <a href="/about" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">About Us</a>
             </div>
           </div>
         </section>

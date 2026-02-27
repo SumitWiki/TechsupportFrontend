@@ -6,13 +6,13 @@ export const metadata = {
   description:
     "Professional remote internet support services in New York. Fix Wi-Fi issues, slow internet & router problems instantly.",
   alternates: {
-    canonical: "https://techsupport4.com/internet-support-new-york",
+    canonical: "/location/internet-support-new-york",
   },
   openGraph: {
     title: "Internet Support New York | TechSupport4",
     description:
       "Fast & secure remote internet troubleshooting in New York.",
-    url: "https://techsupport4.com/internet-support-new-york",
+    url: "https://techsupport4.com/location/internet-support-new-york",
     type: "website",
   },
 };

@@ -6,7 +6,13 @@ export const metadata = {
   description:
     "Professional remote printer troubleshooting services in London, UK.",
   alternates: {
-    canonical: "https://techsupport4.com/printer-support-london",
+    canonical: "/location/printer-support-london",
+  },
+  openGraph: {
+    title: "Printer Support London | Remote Printer Help UK",
+    description: "Professional remote printer troubleshooting services in London, UK.",
+    url: "https://techsupport4.com/location/printer-support-london",
+    type: "website",
   },
 };
 

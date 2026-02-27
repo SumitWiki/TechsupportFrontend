@@ -3,7 +3,8 @@ import LegalLayout from "../../components/LegalLayout";
 export const metadata = {
   title: "Terms and Conditions | TechSupport4",
   description:
-    "Legal terms governing use of TechSupport4 remote support services.",
+    "Legal terms governing use of TechSupport4 remote support services including payment, arbitration, and liability.",
+  alternates: { canonical: "/terms-and-conditions" },
 };
 
 export default function TermsPage() {

@@ -1,18 +1,74 @@
 import Link from "next/link";
+import Script from "next/script";
 
 export const metadata = {
   title: "Start Secure Support Session | TechSupport4",
   description:
-    "Start a secure remote support session with certified technical experts.",
+    "Start a secure remote support session with certified technical experts. 256-bit SSL encrypted connections, available 24/7 across USA, UK and Canada.",
   alternates: { canonical: "/support-session" },
+  openGraph: {
+    title: "Start Secure Support Session | TechSupport4",
+    description: "Connect with certified tech experts through a safe, encrypted remote session. Available 24/7.",
+    url: "https://techsupport4.com/support-session",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Secure Remote Support Session | TechSupport4",
+    description: "Start a secure remote support session with certified technical experts.",
+  },
 };
 
 export default function SupportSessionPage() {
   return (
+    <>
+      {/* Service Schema */}
+      <Script
+        id="session-service-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: "Secure Remote Support Session",
+            description: "Encrypted remote technical support session with certified experts.",
+            provider: {
+              "@type": "Organization",
+              name: "TechSupport4",
+              url: "https://techsupport4.com",
+            },
+            areaServed: [
+              { "@type": "Country", name: "United States" },
+              { "@type": "Country", name: "United Kingdom" },
+              { "@type": "Country", name: "Canada" },
+            ],
+          }),
+        }}
+      />
+      <Script
+        id="session-breadcrumb-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://techsupport4.com" },
+              { "@type": "ListItem", position: 2, name: "Support Session", item: "https://techsupport4.com/support-session" },
+            ],
+          }),
+        }}
+      />
     <main className="bg-slate-50 dark:bg-slate-900 min-h-screen">
       {/* Hero */}
       <section className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white py-16 md:py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
+          {/* Breadcrumb */}
+          <nav className="flex items-center justify-center gap-2 text-blue-300 text-sm mb-6">
+            <Link href="/" className="hover:text-white transition">Home</Link>
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            <span className="text-white">Support Session</span>
+          </nav>
           <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-500/30">
             <svg className="w-8 h-8 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
           </div>
@@ -73,7 +129,20 @@ export default function SupportSessionPage() {
         <p className="text-center text-slate-400 dark:text-slate-500 text-sm mt-6">
           Your privacy is our priority. No data is stored without your consent.
         </p>
+
+        {/* Internal Links */}
+        <div className="mt-10 border-t border-slate-200 dark:border-slate-700 pt-8">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Related Pages</h3>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/contact" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Contact Us</Link>
+            <Link href="/internet-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Internet Support</Link>
+            <Link href="/printer-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Printer Support</Link>
+            <Link href="/wifi-router-support-usa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Wi-Fi Router Support</Link>
+            <Link href="/faq" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">FAQ</Link>
+          </div>
+        </div>
       </section>
     </main>
+    </>
   );
 }

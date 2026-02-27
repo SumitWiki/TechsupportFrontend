@@ -12,6 +12,7 @@ export default function sitemap() {
     { url: "/smart-tv-support-usa", priority: 0.9, changeFrequency: "weekly" },
     { url: "/support-session", priority: 0.8, changeFrequency: "monthly" },
     { url: "/faq", priority: 0.8, changeFrequency: "monthly" },
+    { url: "/about", priority: 0.8, changeFrequency: "monthly" },
   ];
 
   // Location / city pages

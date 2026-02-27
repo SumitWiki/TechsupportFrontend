@@ -3,7 +3,8 @@ import FeedbackSection from "../../components/FeedbackSection";
 export const metadata = {
   title: "Refund Policy | TechSupport4",
   description:
-    "Refund policy for TechSupport4 remote technical support services.",
+    "Refund policy for TechSupport4 remote technical support services. Learn about eligibility, processing times, and chargeback protection.",
+  alternates: { canonical: "/refund-policy" },
 };
 
 export default function RefundPage() {
