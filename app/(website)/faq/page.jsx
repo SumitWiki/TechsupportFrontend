@@ -29,7 +29,7 @@ export default function FAQPage() {
     },
     {
       q: "Do you support USA, UK and Canada?",
-      a: "Yes. We provide certified remote technical support across the United States, United Kingdom, and Canada, with dedicated teams in each region.",
+      a: "Yes. We provide certified remote technical support across the United States, United Kingdom, and Canada, with remote technicians available in your time zone.",
     },
     {
       q: "How long does it take to fix my issue?",

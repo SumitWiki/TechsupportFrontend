@@ -35,7 +35,6 @@ export default function Home() {
               { "@type": "Service", name: "WiFi Router Support" },
               { "@type": "Service", name: "Smart TV Support" },
             ],
-            aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "1247" },
           }),
         }}
       />
@@ -153,8 +152,8 @@ export default function Home() {
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Customer Rating</p>
                       </div>
                       <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-center border border-slate-100 dark:border-slate-700">
-                        <p className="text-3xl font-extrabold text-blue-700 dark:text-blue-400">1K+</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Happy Customers</p>
+                        <p className="text-2xl font-extrabold text-blue-700 dark:text-blue-400">⭐</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Trusted Service</p>
                       </div>
                       <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-center border border-slate-100 dark:border-slate-700">
                         <p className="text-3xl font-extrabold text-blue-700 dark:text-blue-400">24/7</p>
@@ -173,9 +172,9 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-wrap justify-center md:justify-between items-center gap-6 md:gap-4">
               {[
-                { icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z", label: "4.9/5 Rating", sub: "1,247 Reviews", color: "text-yellow-500" },
+                { icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z", label: "Highly Rated", sub: "Trusted by Customers", color: "text-yellow-500" },
                 { icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", label: "256-bit SSL", sub: "Encrypted Sessions", color: "text-green-500" },
-                { icon: "M3 21V5a2 2 0 012-2h14a2 2 0 012 2v16l-4-3-4 3-4-3-4 3z", label: "US Based", sub: "Support Team", color: "text-blue-500" },
+                { icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z", label: "USA, UK & Canada", sub: "Remote Technicians", color: "text-blue-500" },
                 { icon: "M13 10V3L4 14h7v7l9-11h-7z", label: "30 Min", sub: "Avg. Resolution", color: "text-orange-500" },
                 { icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z", label: "24/7/365", sub: "Always Available", color: "text-purple-500" },
               ].map((item, i) => (
@@ -270,6 +269,41 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ==================== COMMON ISSUES WE FIX (Educational) ==================== */}
+        <section className="py-20 md:py-28 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3">Knowledge Base</p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white" style={{ fontFamily: 'var(--font-heading)' }}>
+                Common Internet &amp; Printer Issues We Fix
+              </h2>
+              <p className="mt-4 text-slate-500 dark:text-slate-400 text-lg">
+                Many tech problems have straightforward solutions. Here are the most common issues our technicians resolve daily.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { title: "Internet Keeps Disconnecting", desc: "Frequent disconnections are often caused by outdated router firmware, ISP signal issues, or Wi-Fi channel congestion. A simple router restart or channel change usually fixes it.", link: "/blog/router-not-working-fixes" },
+                { title: "Printer Showing Offline", desc: "The most common printer issue on Windows. Usually caused by the print spooler service crashing, incorrect default printer settings, or an outdated driver.", link: "/blog/printer-offline-fix-guide" },
+                { title: "WiFi Connected, No Internet", desc: "Your device connects to Wi-Fi but can't reach websites. Typically a DNS configuration problem, IP conflict, or an ISP outage. Flushing DNS often resolves it.", link: "/blog/wifi-connected-no-internet" },
+                { title: "Email Won't Send or Receive", desc: "Stuck emails in Outbox, SMTP authentication failures, or incorrect port settings are the usual culprits. Reconfiguring server settings resolves most cases.", link: "/blog/outlook-not-sending-emails" },
+                { title: "Laptop Running Very Slowly", desc: "Too many startup programs, a nearly full hard drive, or malware infection. Disabling startup apps and running a malware scan dramatically improves performance.", link: "/blog/laptop-running-slow" },
+                { title: "Blue Screen of Death (BSOD)", desc: "Windows crashes with a blue screen error. Usually caused by driver conflicts, corrupted system files, or faulty RAM. SFC and DISM commands fix most cases.", link: "/blog/blue-screen-error-fix" },
+              ].map((issue, i) => (
+                <Link key={i} href={issue.link} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-md hover:-translate-y-0.5 transition-all group">
+                  <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">{issue.title}</h3>
+                  <p className="mt-2 text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{issue.desc}</p>
+                  <span className="inline-flex items-center gap-1 mt-4 text-blue-600 dark:text-blue-400 text-sm font-semibold">
+                    Read Guide
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ==================== HOW IT WORKS ==================== */}
         <section className="py-20 md:py-28 bg-slate-50 dark:bg-slate-900">
           <div className="max-w-7xl mx-auto px-6 md:px-8">
@@ -349,7 +383,7 @@ export default function Home() {
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   ),
                   title: "USA, UK & Canada",
-                  desc: "Dedicated support teams for all three regions in your local time zone.",
+                  desc: "Serving customers across all three regions with remote technicians in your time zone.",
                   color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400",
                 },
                 {
@@ -420,11 +454,11 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Business Address Trust Line */}
+            {/* Remote Service Trust Line */}
             <div className="mt-10 text-center">
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                <svg className="w-4 h-4 inline-block mr-1 -mt-0.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                Business Address: 251 Little Falls Drive, Wilmington, DE 19808, United States
+                <svg className="w-4 h-4 inline-block mr-1 -mt-0.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Remote technical support provider serving customers online via secure remote sessions.
               </p>
             </div>
           </div>
@@ -444,8 +478,8 @@ export default function Home() {
                     <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.37 2.448a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.37-2.448a1 1 0 00-1.175 0l-3.37 2.448c-.784.57-1.838-.197-1.54-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.063 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z" /></svg>
                   ))}
                 </div>
-                <span className="text-slate-600 dark:text-slate-300 font-semibold">4.9 out of 5</span>
-                <span className="text-slate-400 text-sm">(1,247 reviews)</span>
+                <span className="text-slate-600 dark:text-slate-300 font-semibold">Highly Rated</span>
+                <span className="text-slate-400 text-sm">Trusted by customers internationally</span>
               </div>
             </div>
 
@@ -489,7 +523,7 @@ export default function Home() {
                 href="/contact"
                 className="inline-flex items-center gap-2 bg-blue-600 text-white px-10 py-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl text-lg"
               >
-                Get Your Issue Fixed Now
+                Get Support Now
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
               </Link>
             </div>
@@ -513,8 +547,8 @@ export default function Home() {
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-4">
                   {[
-                    { num: "1,000+", label: "Happy Customers" },
-                    { num: "4.9/5", label: "Average Rating" },
+                    { num: "24/7", label: "Availability" },
+                    { num: "Trusted", label: "By Customers" },
                     { num: "30 min", label: "Avg. Fix Time" },
                     { num: "24/7", label: "Support Hours" },
                   ].map((stat, i) => (
@@ -562,7 +596,7 @@ export default function Home() {
               {[
                 { q: "Is remote support safe and secure?", a: "Yes. All remote sessions are fully encrypted with 256-bit SSL. You must grant explicit permission before any connection, and you retain full control throughout the session." },
                 { q: "How long does it take to fix my issue?", a: "Most internet, printer, Wi-Fi, and Smart TV issues are resolved within 30 to 60 minutes. Complex issues may require additional time." },
-                { q: "Do you support USA, UK and Canada?", a: "Yes. We provide certified remote technical support across the United States, United Kingdom, and Canada with dedicated teams in each region." },
+                { q: "Do you support USA, UK and Canada?", a: "Yes. We provide certified remote technical support across the United States, United Kingdom, and Canada with remote technicians available in your time zone." },
                 { q: "What payment methods do you accept?", a: "We accept Visa, Mastercard, and PayPal. All payments are processed through PCI-DSS compliant systems." },
               ].map((faq, i) => (
                 <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">

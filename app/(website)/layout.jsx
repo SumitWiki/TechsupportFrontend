@@ -70,14 +70,6 @@ export default function RootLayout({ children }) {
               description: "Certified remote technical support for Internet, Printer, Wi-Fi Router, and Smart TV issues across USA, UK, and Canada.",
               email: "support@techsupport4.com",
               telephone: PHONE_USA,
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: "251 Little Falls Drive",
-                addressLocality: "Wilmington",
-                addressRegion: "DE",
-                postalCode: "19808",
-                addressCountry: "US",
-              },
               areaServed: [
                 { "@type": "Country", name: "United States" },
                 { "@type": "Country", name: "United Kingdom" },
@@ -168,8 +160,8 @@ export default function RootLayout({ children }) {
           <div className="bg-blue-700">
             <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <h3 className="text-xl md:text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-heading)' }}>Need Immediate Tech Support?</h3>
-                <p className="text-blue-100 mt-1 text-sm">Our certified technicians are available 24/7. Call now or start a secure session.</p>
+                <h3 className="text-xl md:text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-heading)' }}>Need Tech Support?</h3>
+                <p className="text-blue-100 mt-1 text-sm">Our certified technicians are available 24/7. Start a secure remote session or give us a call.</p>
               </div>
               <div className="flex gap-3">
                 <a href={`tel:${PHONE_USA}`} className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition shadow-lg flex items-center gap-2 text-sm">
@@ -205,8 +197,8 @@ export default function RootLayout({ children }) {
                     {SUPPORT_EMAIL}
                   </a>
                   <p className="flex items-center gap-2 text-slate-400 text-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    251 Little Falls Drive, Wilmington, DE 19808, USA
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Remote support — serving USA, UK &amp; Canada
                   </p>
                 </div>
               </div>
