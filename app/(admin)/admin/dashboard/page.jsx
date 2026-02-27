@@ -160,6 +160,11 @@ export default function Dashboard() {
   const [ticketLoading, setTicketLoading] = useState(false);
   const [noteText, setNoteText] = useState("");
 
+  /* ── Ticket selection for bulk actions (super_admin only) ── */
+  const [selectedCaseIds, setSelectedCaseIds] = useState(new Set());
+  const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState(null); // { message, type }
+
   /* ── Create User modal ── */
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "simple_user" });
@@ -370,6 +375,77 @@ export default function Dashboard() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  /* ── Toast auto-dismiss ── */
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3500);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  /* ── Clear selection when data reloads ── */
+  useEffect(() => { setSelectedCaseIds(new Set()); }, [chartCases]);
+
+  /* ── Toggle single checkbox ── */
+  const toggleSelect = (caseId) => {
+    setSelectedCaseIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(caseId)) next.delete(caseId); else next.add(caseId);
+      return next;
+    });
+  };
+
+  /* ── Select / Deselect all visible ── */
+  const toggleSelectAll = () => {
+    const visible = (displayLeads.rows || []).map((c) => c.case_id);
+    setSelectedCaseIds((prev) => {
+      const allSelected = visible.length > 0 && visible.every((id) => prev.has(id));
+      if (allSelected) return new Set();
+      return new Set(visible);
+    });
+  };
+
+  /* ── Bulk delete ── */
+  const handleBulkDelete = async () => {
+    if (selectedCaseIds.size === 0) return;
+    if (!confirm(`Delete ${selectedCaseIds.size} ticket(s)? This cannot be undone.`)) return;
+    setDeleting(true);
+    try {
+      const res = await api("/api/cases/bulk-delete", { method: "POST", body: JSON.stringify({ caseIds: [...selectedCaseIds] }) });
+      const data = await res.json();
+      if (res.ok) {
+        setToast({ message: `${data.deleted} ticket(s) deleted successfully`, type: "success" });
+        setSelectedCaseIds(new Set());
+        if (selectedTicket && selectedCaseIds.has(selectedTicket)) { setSelectedTicket(null); setTicketDetail(null); }
+        loadData(true);
+      } else {
+        setToast({ message: data.error || "Delete failed", type: "error" });
+      }
+    } catch {
+      setToast({ message: "Delete failed — network error", type: "error" });
+    } finally { setDeleting(false); }
+  };
+
+  /* ── Single delete (from detail panel) ── */
+  const handleDeleteTicket = async (caseId) => {
+    if (!confirm(`Delete ticket ${caseId}? This cannot be undone.`)) return;
+    setDeleting(true);
+    try {
+      const res = await api(`/api/cases/${caseId}`, { method: "DELETE" });
+      if (res.ok) {
+        setToast({ message: "Ticket deleted successfully", type: "success" });
+        setSelectedTicket(null);
+        setTicketDetail(null);
+        setSelectedCaseIds((prev) => { const n = new Set(prev); n.delete(caseId); return n; });
+        loadData(true);
+      } else {
+        const data = await res.json();
+        setToast({ message: data.error || "Delete failed", type: "error" });
+      }
+    } catch {
+      setToast({ message: "Delete failed — network error", type: "error" });
+    } finally { setDeleting(false); }
+  };
 
   /* ── Handlers ── */
   const handleLogout = async () => {
@@ -855,6 +931,21 @@ export default function Dashboard() {
                       {I.download()} Export CSV
                     </button>
                   </div>
+
+                  {/* Bulk action bar (super_admin only) */}
+                  {isSuperAdminUser(user) && selectedCaseIds.size > 0 && (
+                    <div className="flex items-center gap-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-lg px-4 py-2.5">
+                      <span className="text-sm font-medium text-red-700 dark:text-red-400">{selectedCaseIds.size} selected</span>
+                      <button onClick={handleBulkDelete} disabled={deleting}
+                        className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm">
+                        {deleting ? <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent" /> : I.trash("w-3.5 h-3.5")}
+                        Delete Selected
+                      </button>
+                      <button onClick={() => setSelectedCaseIds(new Set())}
+                        className="text-xs text-red-500 hover:text-red-600 font-medium">Clear Selection</button>
+                    </div>
+                  )}
+
                   {/* Filters */}
                   <div className="flex flex-wrap gap-2">
                     <select value={leadFilter} onChange={(e) => { setLeadFilter(e.target.value); setLeadPage(1); }}
@@ -888,6 +979,14 @@ export default function Dashboard() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-slate-50/80 dark:bg-slate-900/50">
+                        {isSuperAdminUser(user) && (
+                          <th className="w-10 px-3 py-3">
+                            <input type="checkbox"
+                              checked={(displayLeads.rows || []).length > 0 && (displayLeads.rows || []).every((c) => selectedCaseIds.has(c.case_id))}
+                              onChange={toggleSelectAll}
+                              className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+                          </th>
+                        )}
                         <th className="text-left px-4 py-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Case ID</th>
                         <th className="text-left px-4 py-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Customer</th>
                         <th className="text-left px-4 py-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
@@ -899,7 +998,13 @@ export default function Dashboard() {
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {(displayLeads.rows || []).length > 0 ? displayLeads.rows.map((c) => (
                         <tr key={c.id} onClick={() => openTicket(c.case_id)}
-                          className={`cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-100 ${selectedTicket === c.case_id ? "bg-blue-50/50 dark:bg-blue-500/5" : ""}`}>
+                          className={`cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-100 ${selectedTicket === c.case_id ? "bg-blue-50/50 dark:bg-blue-500/5" : ""} ${selectedCaseIds.has(c.case_id) ? "bg-red-50/40 dark:bg-red-500/5" : ""}`}>
+                          {isSuperAdminUser(user) && (
+                            <td className="w-10 px-3 py-3.5" onClick={(e) => e.stopPropagation()}>
+                              <input type="checkbox" checked={selectedCaseIds.has(c.case_id)} onChange={() => toggleSelect(c.case_id)}
+                                className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 cursor-pointer" />
+                            </td>
+                          )}
                           <td className="px-4 py-3.5 font-mono text-xs text-slate-500 dark:text-slate-400">{c.case_id}</td>
                           <td className="px-4 py-3.5">
                             <p className="font-medium text-slate-900 dark:text-white text-[13px]">{c.name}</p>
@@ -916,7 +1021,7 @@ export default function Dashboard() {
                         </tr>
                       )) : (
                         <tr>
-                          <td colSpan={6} className="px-5 py-16 text-center">
+                          <td colSpan={isSuperAdminUser(user) ? 7 : 6} className="px-5 py-16 text-center">
                             {I.clipboard("w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto")}
                             <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">No tickets found</p>
                           </td>
@@ -1042,6 +1147,16 @@ export default function Dashboard() {
                                   <option value="">Unassigned</option>
                                   {teamUsers.filter(u => u.is_active).map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
                                 </select>
+                              </div>
+                            )}
+                            {/* Delete (super_admin only) */}
+                            {isSuperAdminUser(user) && (
+                              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                <button onClick={() => handleDeleteTicket(ticketDetail.case_id)} disabled={deleting}
+                                  className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm">
+                                  {deleting ? <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent" /> : I.trash("w-3.5 h-3.5")}
+                                  Delete Ticket
+                                </button>
                               </div>
                             )}
                           </div>
@@ -1393,6 +1508,16 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── Toast notification ── */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-[60] flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 animate-[slideUp_0.3s_ease-out]
+          ${toast.type === "success" ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30" : "bg-red-50 text-red-800 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30"}`}>
+          {toast.type === "success" ? I.check("w-5 h-5") : I.xMark("w-5 h-5")}
+          {toast.message}
+          <button onClick={() => setToast(null)} className="ml-2 opacity-60 hover:opacity-100 transition">{I.xMark("w-4 h-4")}</button>
         </div>
       )}
     </div>
