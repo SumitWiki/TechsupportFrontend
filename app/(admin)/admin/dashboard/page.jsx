@@ -190,17 +190,22 @@ export default function Dashboard() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   /* ── api helper with automatic token refresh ── */
+  const refreshLock = useRef(null);
   const api = useCallback(async (path, opts = {}) => {
     const doFetch = () => fetch(`${API}${path}`, { credentials: "include", ...opts, headers: { "Content-Type": "application/json", ...opts.headers } });
     let res = await doFetch();
-    // If access token expired, try silent refresh then retry once
-    if (res.status === 401) {
-      const body = await res.clone().json().catch(() => ({}));
-      if (body.code === "TOKEN_EXPIRED") {
-        const refreshRes = await fetch(`${API}/api/auth/refresh`, { method: "POST", credentials: "include" });
-        if (refreshRes.ok) {
-          res = await doFetch();
-        }
+    // On any 401, try silent refresh (skip for auth refresh/login to avoid loops)
+    if (res.status === 401 && path !== "/api/auth/refresh") {
+      // Deduplicate concurrent refresh calls — only one at a time
+      if (!refreshLock.current) {
+        refreshLock.current = fetch(`${API}/api/auth/refresh`, { method: "POST", credentials: "include" })
+          .then(r => r.ok)
+          .catch(() => false)
+          .finally(() => { refreshLock.current = null; });
+      }
+      const refreshed = await refreshLock.current;
+      if (refreshed) {
+        res = await doFetch(); // retry with new access token cookie
       }
     }
     return res;
