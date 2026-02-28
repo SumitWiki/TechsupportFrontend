@@ -62,13 +62,16 @@ const roleBadge = (r) => {
   const map = {
     super_admin: "bg-red-50 text-red-700 ring-1 ring-red-600/20 dark:bg-red-500/10 dark:text-red-400",
     admin: "bg-purple-50 text-purple-700 ring-1 ring-purple-600/20 dark:bg-purple-500/10 dark:text-purple-400",
+    user: "bg-blue-50 text-blue-700 ring-1 ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400",
     super_user: "bg-blue-50 text-blue-700 ring-1 ring-blue-600/20 dark:bg-blue-500/10 dark:text-blue-400",
     simple_user: "bg-slate-50 text-slate-600 ring-1 ring-slate-300/40 dark:bg-slate-800 dark:text-slate-400",
   };
-  return map[r] || map.simple_user;
+  return map[r] || map.user;
 };
 
-const ROLE_LABELS = { super_admin: "Super Admin", admin: "Admin", super_user: "Super User", simple_user: "Simple User" };
+const ROLE_LABELS = { super_admin: "Super Admin", admin: "Admin", user: "User", super_user: "User", simple_user: "User" };
+const VALID_ROLES = ["super_admin", "admin", "user"];
+const PERMS = ["read", "write", "modify", "delete"];
 
 const activityIcon = (action) => {
   const map = {
@@ -167,7 +170,7 @@ export default function Dashboard() {
 
   /* ── Create User modal ── */
   const [showCreateUser, setShowCreateUser] = useState(false);
-  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "simple_user" });
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "user", permissions: { read: true, write: false, modify: false, delete: false } });
   const [createError, setCreateError] = useState("");
   const [creating, setCreating] = useState(false);
 
@@ -188,6 +191,15 @@ export default function Dashboard() {
 
   /* ── Profile dropdown ── */
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  /* ── Customer management ── */
+  const [customers, setCustomers] = useState([]);
+  const [showAddCustomer, setShowAddCustomer] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({ name: "", email: "", phone: "", address: "", amount: "", paid_amount: "", offer: "" });
+  const [customerSearch, setCustomerSearch] = useState("");
+
+  /* ── Team view toggle ── */
+  const [teamView, setTeamView] = useState("team"); // "team" | "user"
 
   /* ── api helper with automatic token refresh ── */
   const refreshLock = useRef(null);
@@ -240,6 +252,7 @@ export default function Dashboard() {
         api("/api/cases/stats"),
         api("/api/cases/?page=1&limit=200"),
         api("/api/notifications/count"),
+        api("/api/customers"),
       ];
       if (admin) {
         promises.push(api("/api/users/"));
@@ -257,12 +270,16 @@ export default function Dashboard() {
         const d = await results[2].value.json();
         setUnreadCount(d.count || 0);
       }
-      if (admin && results[3]?.status === "fulfilled" && results[3].value.ok) {
+      if (results[3].status === "fulfilled" && results[3].value.ok) {
         const d = await results[3].value.json();
-        setTeamUsers(d.users || []);
+        setCustomers(d.results || []);
       }
       if (admin && results[4]?.status === "fulfilled" && results[4].value.ok) {
         const d = await results[4].value.json();
+        setTeamUsers(d.users || []);
+      }
+      if (admin && results[5]?.status === "fulfilled" && results[5].value.ok) {
+        const d = await results[5].value.json();
         setAuditLogs(d.logs || []);
       }
     } catch (err) {
@@ -485,7 +502,7 @@ export default function Dashboard() {
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || "Failed to create user");
       setShowCreateUser(false);
-      setNewUser({ name: "", email: "", password: "", role: "simple_user" });
+      setNewUser({ name: "", email: "", password: "", role: "user", permissions: { read: true, write: false, modify: false, delete: false } });
       const r = await api("/api/users/");
       if (r.ok) { const dd = await r.json(); setTeamUsers(dd.users || []); }
     } catch (err) { setCreateError(err.message); }
@@ -556,6 +573,50 @@ export default function Dashboard() {
     } catch {}
   };
 
+  /* ── Update user permissions ── */
+  const updateUserPermissions = async (id, permissions) => {
+    try {
+      const res = await api(`/api/users/${id}`, { method: "PUT", body: JSON.stringify({ permissions }) });
+      if (res.ok) {
+        setTeamUsers((prev) => prev.map((u) => u.id === id ? { ...u, permissions: JSON.stringify(permissions) } : u));
+        setToast({ message: "Permissions updated", type: "success" });
+      } else {
+        const d = await res.json();
+        setToast({ message: d.error || "Failed to update permissions", type: "error" });
+      }
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  /* ── Customer handlers ── */
+  const handleAddCustomer = async () => {
+    try {
+      const res = await api("/api/customers", { method: "POST", body: JSON.stringify(newCustomer) });
+      const d = await res.json();
+      if (!res.ok) { setToast({ message: d.error || "Failed to add customer", type: "error" }); return; }
+      setToast({ message: "Customer added successfully", type: "success" });
+      setShowAddCustomer(false);
+      setNewCustomer({ name: "", email: "", phone: "", address: "", amount: "", paid_amount: "", offer: "" });
+      loadData(true);
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  const handleDeleteCustomer = async (id, name) => {
+    if (!confirm(`Delete customer "${name}"?`)) return;
+    try {
+      const res = await api(`/api/customers/${id}`, { method: "DELETE" });
+      if (res.ok) { setToast({ message: "Customer deleted", type: "success" }); loadData(true); }
+      else { const d = await res.json(); setToast({ message: d.error || "Failed to delete", type: "error" }); }
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  const filteredCustomers = customerSearch.trim()
+    ? customers.filter(c =>
+        c.name?.toLowerCase().includes(customerSearch.toLowerCase()) ||
+        c.email?.toLowerCase().includes(customerSearch.toLowerCase()) ||
+        c.phone?.includes(customerSearch)
+      )
+    : customers;
+
   /* ── Computed chart data ── */
   const weeklyLeads = useMemo(() => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -604,13 +665,14 @@ export default function Dashboard() {
     { key: "overview", label: "Overview", icon: I.home },
     { key: "leads", label: "Tickets", icon: I.clipboard },
     { key: "search", label: "Search", icon: I.search },
+    { key: "customers", label: "Customers", icon: I.users },
     ...(isAdminPlus(user) ? [
       { key: "team", label: "Team", icon: I.team },
       { key: "activity", label: "Activity Log", icon: I.activity },
     ] : []),
   ];
 
-  const TITLES = { overview: "Dashboard Overview", leads: "Ticket Management", search: "Search Customer", team: "User Management", activity: "Activity Log" };
+  const TITLES = { overview: "Dashboard Overview", leads: "Ticket Management", search: "Search Customer", customers: "Customer Management", team: "User Management", activity: "Activity Log" };
 
   const statCards = stats ? [
     { label: "Total Leads", value: (Number(stats.total) || 0).toLocaleString(), sub: `${Number(stats.today) || 0} today`, icon: I.users, color: "bg-blue-600" },
@@ -1262,12 +1324,23 @@ export default function Dashboard() {
                   <h3 className="text-base font-bold text-slate-900 dark:text-white">User Management</h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{teamUsers.length} users &middot; Manage access, roles & permissions</p>
                 </div>
-                {isSuperAdminUser(user) && (
-                  <button onClick={() => { setShowCreateUser(true); setCreateError(""); }}
-                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm">
-                    {I.plus("w-4 h-4")} Add User
-                  </button>
-                )}
+                <div className="flex items-center gap-3">
+                  {/* Team / User view toggle */}
+                  <div className="flex bg-slate-100 dark:bg-slate-900 rounded-lg p-0.5">
+                    {["team", "user"].map((v) => (
+                      <button key={v} onClick={() => setTeamView(v)}
+                        className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${teamView === v ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"}`}>
+                        {v === "team" ? "Team View" : "User View"}
+                      </button>
+                    ))}
+                  </div>
+                  {isSuperAdminUser(user) && (
+                    <button onClick={() => { setShowCreateUser(true); setCreateError(""); }}
+                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm">
+                      {I.plus("w-4 h-4")} Add User
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Role Legend */}
@@ -1275,8 +1348,7 @@ export default function Dashboard() {
                 {[
                   { role: "super_admin", desc: "Full system access" },
                   { role: "admin", desc: "Manage tickets & users" },
-                  { role: "super_user", desc: "Assign & close tickets" },
-                  { role: "simple_user", desc: "View own tickets only" },
+                  { role: "user", desc: "Permission-based access" },
                 ].map((r) => (
                   <div key={r.role} className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2">
                     <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-semibold ${roleBadge(r.role)}`}>{ROLE_LABELS[r.role]}</span>
@@ -1285,86 +1357,351 @@ export default function Dashboard() {
                 ))}
               </div>
 
-              {/* Team Table */}
+              {/* Permission Legend */}
+              <div className="px-5 pb-4 flex flex-wrap gap-2">
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mr-1">Permissions:</span>
+                {PERMS.map((p) => (
+                  <span key={p} className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2 py-0.5">
+                    {p === "read" ? I.eye("w-3 h-3") : p === "write" ? I.plus("w-3 h-3") : p === "modify" ? I.edit("w-3 h-3") : I.trash("w-3 h-3")}
+                    {p.charAt(0).toUpperCase() + p.slice(1)}
+                  </span>
+                ))}
+              </div>
+
+              {/* ── TEAM VIEW: Table layout ── */}
+              {teamView === "team" && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-50/80 dark:bg-slate-900/50">
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Member</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Permissions</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Joined</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {teamUsers.map((m) => {
+                        const isSelf = m.id === user?.id;
+                        const active = m.is_active === 1 || m.is_active === true;
+                        const targetIsSuperAdmin = m.role === "super_admin" || m.email?.toLowerCase() === "support@techsupport4.com";
+                        const perms = typeof m.permissions === "string" ? (() => { try { return JSON.parse(m.permissions); } catch { return {}; } })() : (m.permissions || {});
+                        return (
+                          <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-100">
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
+                                  {(m.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-slate-900 dark:text-white text-[13px]">
+                                    {m.name} {isSelf && <span className="text-[10px] text-blue-500 font-semibold ml-1">(You)</span>}
+                                  </p>
+                                  <p className="text-xs text-slate-400">{m.email}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-5 py-4">
+                              {isSuperAdminUser(user) && !isSelf && !targetIsSuperAdmin ? (
+                                <select value={m.role} onChange={(e) => changeUserRole(m.id, e.target.value)}
+                                  className="text-xs font-semibold bg-transparent border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                  {VALID_ROLES.map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
+                                </select>
+                              ) : (
+                                <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${roleBadge(m.role)}`}>{ROLE_LABELS[m.role] || m.role}</span>
+                              )}
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex flex-wrap gap-1">
+                                {m.role === "super_admin" || m.role === "admin" ? (
+                                  <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">All Access</span>
+                                ) : (
+                                  PERMS.map((p) => (
+                                    <span key={p} className={`text-[10px] font-semibold px-2 py-0.5 rounded ${perms[p] ? "text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10" : "text-slate-400 bg-slate-50 dark:text-slate-500 dark:bg-slate-900 line-through"}`}>
+                                      {p.charAt(0).toUpperCase() + p.slice(1)}
+                                    </span>
+                                  ))
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${active ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`}>
+                                <span className={`w-2 h-2 rounded-full ${active ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"}`} />
+                                {active ? "Active" : "Inactive"}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 text-slate-400 text-xs hidden md:table-cell">{formatDate(m.created_at)}</td>
+                            <td className="px-5 py-4">
+                              {!isSelf && !targetIsSuperAdmin && (
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <button onClick={() => toggleUserActive(m.id, active)}
+                                    className={`px-2 py-1 rounded-md text-[11px] font-medium transition ${active ? "bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400"}`}>
+                                    {active ? "Disable" : "Enable"}
+                                  </button>
+                                  {isAdminPlus(user) && (
+                                    <>
+                                      <button onClick={() => forceLogoutUser(m.id)}
+                                        className="px-2 py-1 rounded-md text-[11px] font-medium bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Force logout">
+                                        {I.logout("w-3 h-3")}
+                                      </button>
+                                    </>
+                                  )}
+                                  {isSuperAdminUser(user) && (
+                                    <>
+                                      <button onClick={() => { setResetPwdUser(m); setResetPwdValue(""); setResetPwdError(""); }}
+                                        className="px-2 py-1 rounded-md text-[11px] font-medium bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Reset password">
+                                        {I.key("w-3 h-3")}
+                                      </button>
+                                      <button onClick={() => deleteUser(m.id)}
+                                        className="px-2 py-1 rounded-md text-[11px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition" title="Delete user">
+                                        {I.trash("w-3 h-3")}
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* ── USER VIEW: Card layout with permission checkboxes ── */}
+              {teamView === "user" && (
+                <div className="p-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {teamUsers.map((m) => {
+                    const isSelf = m.id === user?.id;
+                    const active = m.is_active === 1 || m.is_active === true;
+                    const targetIsSuperAdmin = m.role === "super_admin" || m.email?.toLowerCase() === "support@techsupport4.com";
+                    const perms = typeof m.permissions === "string" ? (() => { try { return JSON.parse(m.permissions); } catch { return {}; } })() : (m.permissions || {});
+                    const canEditPerms = isSuperAdminUser(user) && !isSelf && !targetIsSuperAdmin && m.role === "user";
+                    return (
+                      <div key={m.id} className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
+                            {(m.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-slate-900 dark:text-white text-sm truncate">
+                              {m.name} {isSelf && <span className="text-[10px] text-blue-500 font-semibold">(You)</span>}
+                            </p>
+                            <p className="text-xs text-slate-400 truncate">{m.email}</p>
+                          </div>
+                          <span className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-semibold ${roleBadge(m.role)}`}>{ROLE_LABELS[m.role] || m.role}</span>
+                        </div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className={`inline-flex items-center gap-1 text-xs font-medium ${active ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${active ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"}`} />
+                            {active ? "Active" : "Inactive"}
+                          </span>
+                          <span className="text-[11px] text-slate-400">&middot; Joined {formatDate(m.created_at)}</span>
+                        </div>
+
+                        {/* Permission checkboxes */}
+                        <div className="border-t border-slate-200 dark:border-slate-700 pt-3 mt-1">
+                          <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Permissions</p>
+                          {m.role === "super_admin" || m.role === "admin" ? (
+                            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Full access — all permissions granted</p>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-2">
+                              {PERMS.map((p) => (
+                                <label key={p} className={`flex items-center gap-2 text-xs rounded-lg px-2.5 py-1.5 border transition ${canEditPerms ? "cursor-pointer hover:bg-white dark:hover:bg-slate-800" : "cursor-default"} ${perms[p] ? "border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-500/5" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"}`}>
+                                  <input type="checkbox" checked={!!perms[p]} disabled={!canEditPerms}
+                                    onChange={() => { const updated = { ...perms, [p]: !perms[p] }; updateUserPermissions(m.id, updated); }}
+                                    className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50" />
+                                  <span className={`font-medium ${perms[p] ? "text-slate-700 dark:text-slate-200" : "text-slate-400 dark:text-slate-500"}`}>
+                                    {p.charAt(0).toUpperCase() + p.slice(1)}
+                                  </span>
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        {!isSelf && !targetIsSuperAdmin && (
+                          <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 flex-wrap">
+                            <button onClick={() => toggleUserActive(m.id, active)}
+                              className={`px-2 py-1 rounded-md text-[11px] font-medium transition ${active ? "bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400"}`}>
+                              {active ? "Disable" : "Enable"}
+                            </button>
+                            {isAdminPlus(user) && (
+                              <button onClick={() => forceLogoutUser(m.id)}
+                                className="px-2 py-1 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Force logout">
+                                {I.logout("w-3 h-3")} <span className="ml-0.5">Logout</span>
+                              </button>
+                            )}
+                            {isSuperAdminUser(user) && (
+                              <>
+                                <button onClick={() => { setResetPwdUser(m); setResetPwdValue(""); setResetPwdError(""); }}
+                                  className="px-2 py-1 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Reset password">
+                                  {I.key("w-3 h-3")}
+                                </button>
+                                <button onClick={() => deleteUser(m.id)}
+                                  className="px-2 py-1 rounded-md text-[11px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition" title="Delete user">
+                                  {I.trash("w-3 h-3")}
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ══════ CUSTOMERS TAB ══════ */}
+          {activeTab === "customers" && (
+            <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800">
+              <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Customer Management</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{customers.length} customers</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <input type="text" placeholder="Search customers..." value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)}
+                      className="pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-52 transition" />
+                    {I.search("w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400")}
+                  </div>
+                  {(isAdminPlus(user) || canDo(user, "write")) && (
+                    <button onClick={() => setShowAddCustomer(true)}
+                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm">
+                      {I.plus("w-4 h-4")} Add Customer
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Add Customer Form (inline) */}
+              {showAddCustomer && (
+                <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Add New Customer</h4>
+                    <button onClick={() => setShowAddCustomer(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">{I.xMark("w-4 h-4")}</button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Name *</label>
+                      <input type="text" required value={newCustomer.name} onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Customer name" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Mobile *</label>
+                      <input type="tel" required value={newCustomer.phone} onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="+1 (555) 000-0000" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Email</label>
+                      <input type="email" value={newCustomer.email} onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="email@example.com" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Address</label>
+                      <input type="text" value={newCustomer.address} onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Street, City, State" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Amount</label>
+                      <input type="number" step="0.01" value={newCustomer.amount} onChange={(e) => setNewCustomer({ ...newCustomer, amount: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="0.00" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Paid Amount</label>
+                      <input type="number" step="0.01" value={newCustomer.paid_amount} onChange={(e) => setNewCustomer({ ...newCustomer, paid_amount: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="0.00" />
+                    </div>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Offer / Notes</label>
+                      <input type="text" value={newCustomer.offer} onChange={(e) => setNewCustomer({ ...newCustomer, offer: e.target.value })}
+                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Discount, promo code, special offer..." />
+                    </div>
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    <button onClick={handleAddCustomer}
+                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm">
+                      {I.plus("w-4 h-4")} Save Customer
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Customer Table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-slate-50/80 dark:bg-slate-900/50">
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Member</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Role</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Joined</th>
+                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Customer</th>
+                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Contact</th>
+                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Address</th>
+                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Amount</th>
+                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">Offer</th>
+                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Added By</th>
                       <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {teamUsers.map((m) => {
-                      const isSelf = m.id === user?.id;
-                      const active = m.is_active === 1 || m.is_active === true;
-                      const targetIsSuperAdmin = m.role === "super_admin" || m.email?.toLowerCase() === "support@techsupport4.com";
-                      return (
-                        <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-100">
-                          <td className="px-5 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
-                                {(m.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
-                              </div>
-                              <div>
-                                <p className="font-medium text-slate-900 dark:text-white text-[13px]">
-                                  {m.name} {isSelf && <span className="text-[10px] text-blue-500 font-semibold ml-1">(You)</span>}
-                                </p>
-                                <p className="text-xs text-slate-400">{m.email}</p>
-                              </div>
+                    {filteredCustomers.length > 0 ? filteredCustomers.map((c) => (
+                      <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-100">
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-300">
+                              {(c.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                             </div>
-                          </td>
-                          <td className="px-5 py-4">
-                            {isSuperAdminUser(user) && !isSelf && !targetIsSuperAdmin ? (
-                              <select value={m.role} onChange={(e) => changeUserRole(m.id, e.target.value)}
-                                className="text-xs font-semibold bg-transparent border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="admin">Admin</option>
-                                <option value="super_user">Super User</option>
-                                <option value="simple_user">Simple User</option>
-                              </select>
-                            ) : (
-                              <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${roleBadge(m.role)}`}>{ROLE_LABELS[m.role] || m.role}</span>
+                            <p className="font-medium text-slate-900 dark:text-white text-[13px]">{c.name}</p>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4">
+                          <p className="text-xs text-slate-700 dark:text-slate-300">{c.phone || "—"}</p>
+                          <p className="text-[11px] text-slate-400">{c.email || "—"}</p>
+                        </td>
+                        <td className="px-5 py-4 text-xs text-slate-500 dark:text-slate-400 hidden md:table-cell max-w-[200px] truncate">{c.address || "—"}</td>
+                        <td className="px-5 py-4">
+                          <div>
+                            <p className="text-xs font-semibold text-slate-900 dark:text-white">${parseFloat(c.amount || 0).toFixed(2)}</p>
+                            <p className="text-[11px] text-emerald-600 dark:text-emerald-400">Paid: ${parseFloat(c.paid_amount || 0).toFixed(2)}</p>
+                            {(parseFloat(c.amount || 0) - parseFloat(c.paid_amount || 0)) > 0 && (
+                              <p className="text-[10px] text-amber-600 dark:text-amber-400">Due: ${(parseFloat(c.amount || 0) - parseFloat(c.paid_amount || 0)).toFixed(2)}</p>
                             )}
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${active ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"}`}>
-                              <span className={`w-2 h-2 rounded-full ${active ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"}`} />
-                              {active ? "Active" : "Inactive"}
-                            </span>
-                          </td>
-                          <td className="px-5 py-4 text-slate-400 text-xs hidden md:table-cell">{formatDate(m.created_at)}</td>
-                          <td className="px-5 py-4">
-                            {!isSelf && !targetIsSuperAdmin && (
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <button onClick={() => toggleUserActive(m.id, active)}
-                                  className={`px-2 py-1 rounded-md text-[11px] font-medium transition ${active ? "bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400"}`}>
-                                  {active ? "Disable" : "Enable"}
-                                </button>
-                                {isSuperAdminUser(user) && (
-                                  <>
-                                    <button onClick={() => { setResetPwdUser(m); setResetPwdValue(""); setResetPwdError(""); }}
-                                      className="px-2 py-1 rounded-md text-[11px] font-medium bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Reset password">
-                                      {I.key("w-3 h-3")}
-                                    </button>
-                                    <button onClick={() => forceLogoutUser(m.id)}
-                                      className="px-2 py-1 rounded-md text-[11px] font-medium bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Force logout">
-                                      {I.logout("w-3 h-3")}
-                                    </button>
-                                    <button onClick={() => deleteUser(m.id)}
-                                      className="px-2 py-1 rounded-md text-[11px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition" title="Delete user">
-                                      {I.trash("w-3 h-3")}
-                                    </button>
-                                  </>
-                                )}
-                              </div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 text-xs text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[150px] truncate">{c.offer || "—"}</td>
+                        <td className="px-5 py-4">
+                          <p className="text-xs font-medium text-slate-700 dark:text-slate-300">{c.added_by_name || "System"}</p>
+                          <p className="text-[11px] text-slate-400">{formatDateTime(c.created_at)}</p>
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-1.5">
+                            {(isSuperAdminUser(user) || canDo(user, "delete")) && (
+                              <button onClick={() => handleDeleteCustomer(c.id, c.name)}
+                                className="px-2 py-1 rounded-md text-[11px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition" title="Delete customer">
+                                {I.trash("w-3.5 h-3.5")}
+                              </button>
                             )}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                          </div>
+                        </td>
+                      </tr>
+                    )) : (
+                      <tr>
+                        <td colSpan={7} className="px-5 py-16 text-center">
+                          {I.users("w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto")}
+                          <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            {customerSearch ? "No customers match your search" : "No customers yet"}
+                          </p>
+                          {!customerSearch && (isAdminPlus(user) || canDo(user, "write")) && (
+                            <button onClick={() => setShowAddCustomer(true)} className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium">Add your first customer</button>
+                          )}
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1443,12 +1780,28 @@ export default function Dashboard() {
                 <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Role</label>
                 <select value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                   className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                  <option value="simple_user">Simple User</option>
-                  <option value="super_user">Super User</option>
-                  <option value="admin">Admin</option>
-                  {isSuperAdminUser(user) && <option value="super_admin">Super Admin</option>}
+                  {VALID_ROLES.filter((r) => r !== "super_admin" || isSuperAdminUser(user)).map((r) => (
+                    <option key={r} value={r}>{ROLE_LABELS[r]}</option>
+                  ))}
                 </select>
               </div>
+              {/* Permission checkboxes (only meaningful for 'user' role) */}
+              {newUser.role === "user" && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Permissions</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {PERMS.map((p) => (
+                      <label key={p} className={`flex items-center gap-2 text-sm rounded-lg px-3 py-2 border cursor-pointer transition hover:bg-slate-100 dark:hover:bg-slate-800 ${newUser.permissions?.[p] ? "border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5" : "border-slate-200 dark:border-slate-700"}`}>
+                        <input type="checkbox" checked={!!newUser.permissions?.[p]}
+                          onChange={() => setNewUser({ ...newUser, permissions: { ...newUser.permissions, [p]: !newUser.permissions?.[p] } })}
+                          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                        <span className="text-slate-700 dark:text-slate-300 font-medium">{p.charAt(0).toUpperCase() + p.slice(1)}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1.5">Admin & Super Admin roles get all permissions automatically</p>
+                </div>
+              )}
               {createError && <p className="text-sm text-red-600 bg-red-50 dark:bg-red-500/10 px-3 py-2 rounded-lg">{createError}</p>}
               <button type="submit" disabled={creating}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50 shadow-sm">
