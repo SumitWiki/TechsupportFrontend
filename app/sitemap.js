@@ -47,6 +47,70 @@ export default function sitemap() {
     "usb-not-recognized",
   ];
 
+  // Long-tail keyword pages (Phase 5 — 50 pages)
+  const longTailSlugs = [
+    // Batch 1: Netgear / TP-Link / Linksys routers
+    "netgear-router-not-working-after-reset",
+    "netgear-router-blinking-orange-light",
+    "tp-link-router-connected-but-no-internet",
+    "tp-link-router-not-working-after-power-outage",
+    "linksys-router-not-working-after-power-outage",
+    // Batch 2: Linksys / Asus / D-Link
+    "linksys-router-not-connecting-to-internet",
+    "asus-router-firmware-update-failed",
+    "asus-router-not-connecting-to-internet",
+    "d-link-router-not-connecting-to-modem",
+    "d-link-router-blinking-orange-light",
+    // Batch 3: Arris / Xfinity / Spectrum
+    "arris-modem-not-connecting-to-internet",
+    "xfinity-router-not-working-after-reset",
+    "xfinity-router-blinking-orange-light",
+    "spectrum-router-red-light-blinking",
+    "spectrum-router-not-connecting-to-internet",
+    // Batch 4: Verizon / HP Printer
+    "verizon-fios-router-not-working",
+    "verizon-fios-no-internet-after-storm",
+    "hp-printer-offline-windows-11-fix",
+    "hp-printer-driver-error-windows-10",
+    "hp-printer-not-printing-after-ink-change",
+    // Batch 5: Canon / Epson
+    "canon-printer-not-printing-black-ink",
+    "canon-printer-offline-fix",
+    "canon-printer-setup-failed",
+    "epson-printer-driver-unavailable-windows-10",
+    "epson-printer-not-connecting-to-wifi",
+    // Batch 6: Brother / Outlook / Gmail
+    "brother-printer-wifi-setup-failed",
+    "brother-printer-offline-fix",
+    "outlook-not-sending-emails-windows-11",
+    "outlook-password-not-accepted",
+    "gmail-not-loading-in-chrome",
+    // Batch 7: Gmail / Yahoo / WiFi
+    "gmail-login-problem-fix",
+    "yahoo-mail-not-working-today",
+    "yahoo-mail-login-problem",
+    "wifi-connected-but-no-internet-windows-10",
+    "wifi-connected-but-no-internet-windows-11",
+    // Batch 8: Internet / WiFi situational
+    "internet-not-working-after-router-reset",
+    "internet-not-working-after-power-outage",
+    "internet-slow-at-night-fix",
+    "wifi-keeps-disconnecting-windows-11",
+    "wifi-not-working-after-changing-password",
+    // Batch 9: Storm / Mac / Router Admin / LED / Firmware
+    "internet-not-working-after-storm",
+    "wifi-not-working-on-mac",
+    "router-login-page-not-opening",
+    "router-red-light-blinking-fix",
+    "router-not-working-after-firmware-update",
+    // Batch 10: Modem / Factory Reset / Timeout / Moving / Win10
+    "router-not-connecting-to-modem",
+    "wifi-not-connecting-after-factory-reset",
+    "internet-connection-timeout-fix",
+    "slow-internet-after-moving-house",
+    "wifi-keeps-disconnecting-windows-10",
+  ];
+
   // Blog posts
   const blogSlugs = [
     "how-to-fix-internet-not-working",
@@ -103,6 +167,13 @@ export default function sitemap() {
     changeFrequency: "monthly",
   }));
 
+  const longTailUrls = longTailSlugs.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: now,
+    priority: 0.8,
+    changeFrequency: "monthly",
+  }));
+
   const blogUrls = blogSlugs.map((slug) => ({
     url: `${baseUrl}/blog/${slug}`,
     lastModified: now,
@@ -117,5 +188,5 @@ export default function sitemap() {
     changeFrequency: "yearly",
   }));
 
-  return [...serviceUrls, ...troubleshootingUrls, ...locationUrls, blogIndex, ...blogUrls, ...legalUrls];
+  return [...serviceUrls, ...troubleshootingUrls, ...longTailUrls, ...locationUrls, blogIndex, ...blogUrls, ...legalUrls];
 }
