@@ -23,6 +23,30 @@ export default function sitemap() {
     "wifi-support-toronto",
   ];
 
+  // Standalone troubleshooting pages (SEO authority)
+  const troubleshootingSlugs = [
+    "internet-not-working",
+    "router-not-working",
+    "netgear-router-not-working",
+    "tp-link-router-not-working",
+    "wifi-connected-but-no-internet",
+    "wifi-not-working",
+    "printer-not-working",
+    "hp-printer-not-working",
+    "epson-printer-not-printing",
+    "printer-offline-fix",
+    "email-not-working",
+    "outlook-not-working",
+    "gmail-not-working",
+    "computer-running-slow",
+    "blue-screen-of-death-fix",
+    "windows-update-not-working",
+    "google-chrome-not-working",
+    "bluetooth-not-working",
+    "smart-tv-not-connecting-to-wifi",
+    "usb-not-recognized",
+  ];
+
   // Blog posts
   const blogSlugs = [
     "how-to-fix-internet-not-working",
@@ -72,6 +96,13 @@ export default function sitemap() {
     changeFrequency: "monthly",
   }));
 
+  const troubleshootingUrls = troubleshootingSlugs.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: now,
+    priority: 0.8,
+    changeFrequency: "monthly",
+  }));
+
   const blogUrls = blogSlugs.map((slug) => ({
     url: `${baseUrl}/blog/${slug}`,
     lastModified: now,
@@ -86,5 +117,5 @@ export default function sitemap() {
     changeFrequency: "yearly",
   }));
 
-  return [...serviceUrls, ...locationUrls, blogIndex, ...blogUrls, ...legalUrls];
+  return [...serviceUrls, ...troubleshootingUrls, ...locationUrls, blogIndex, ...blogUrls, ...legalUrls];
 }
