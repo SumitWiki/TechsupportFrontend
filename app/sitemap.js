@@ -111,6 +111,37 @@ export default function sitemap() {
     "wifi-keeps-disconnecting-windows-10",
   ];
 
+  // ISP-specific pages (Phase 6 — 10 pages)
+  const ispSlugs = [
+    "xfinity-router-not-working",
+    "spectrum-router-not-working",
+    "comcast-internet-not-working",
+    "cox-router-not-working",
+    "att-router-not-working",
+    "optimum-router-not-working",
+    "centurylink-router-not-working",
+    "frontier-internet-not-working",
+    "tmobile-home-internet-not-working",
+    "windstream-internet-not-working",
+  ];
+
+  // "After Situation" pages (Phase 6 — 8 pages)
+  const afterSituationSlugs = [
+    "printer-offline-after-windows-update",
+    "wifi-not-working-after-windows-update",
+    "internet-not-working-after-modem-replacement",
+    "computer-slow-after-windows-update",
+    "bluetooth-not-working-after-update",
+    "wifi-not-working-after-sleep-mode",
+    "printer-not-printing-after-driver-update",
+    "internet-not-working-after-changing-router",
+  ];
+
+  // Authority / pillar pages (Phase 6 — 1 page)
+  const authoritySlugs = [
+    "complete-internet-router-troubleshooting-guide",
+  ];
+
   // Blog posts
   const blogSlugs = [
     "how-to-fix-internet-not-working",
@@ -174,6 +205,27 @@ export default function sitemap() {
     changeFrequency: "monthly",
   }));
 
+  const ispUrls = ispSlugs.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: now,
+    priority: 0.8,
+    changeFrequency: "monthly",
+  }));
+
+  const afterSituationUrls = afterSituationSlugs.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: now,
+    priority: 0.8,
+    changeFrequency: "monthly",
+  }));
+
+  const authorityUrls = authoritySlugs.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: now,
+    priority: 0.9,
+    changeFrequency: "weekly",
+  }));
+
   const blogUrls = blogSlugs.map((slug) => ({
     url: `${baseUrl}/blog/${slug}`,
     lastModified: now,
@@ -188,5 +240,5 @@ export default function sitemap() {
     changeFrequency: "yearly",
   }));
 
-  return [...serviceUrls, ...troubleshootingUrls, ...longTailUrls, ...locationUrls, blogIndex, ...blogUrls, ...legalUrls];
+  return [...serviceUrls, ...troubleshootingUrls, ...longTailUrls, ...ispUrls, ...afterSituationUrls, ...authorityUrls, ...locationUrls, blogIndex, ...blogUrls, ...legalUrls];
 }
