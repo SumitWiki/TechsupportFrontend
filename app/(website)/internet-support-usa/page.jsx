@@ -107,7 +107,7 @@ export default function InternetSupportUSA() {
               </p>
               <div className="flex flex-wrap gap-4 mt-8">
                 <a href="/contact" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Get Help Now</a>
-                <a href="tel:+18889501777" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
+                <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
               </div>
             </div>
             <div className="hidden md:flex justify-center">
@@ -177,7 +177,7 @@ export default function InternetSupportUSA() {
           <p className="mt-3 text-blue-100 max-w-xl mx-auto">Talk to a certified technician now. Available 24/7, 365 days a year.</p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <a href="/contact" className="bg-white text-blue-700 px-8 py-3.5 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg">Get Help Now</a>
-            <a href="tel:+18889501777" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+            <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
           </div>
         </div>
       </section>

@@ -33,7 +33,7 @@ export default function AboutPage() {
             description:
               "Certified remote technical support for Internet, Printer, Wi-Fi Router, and Smart TV issues across USA, UK, and Canada.",
             email: "support@techsupport4.com",
-            telephone: "+18889501777",
+            telephone: process.env.NEXT_PUBLIC_PHONE_USA,
             areaServed: [
               { "@type": "Country", name: "United States" },
               { "@type": "Country", name: "United Kingdom" },
@@ -42,7 +42,7 @@ export default function AboutPage() {
             sameAs: [],
             contactPoint: {
               "@type": "ContactPoint",
-              telephone: "+18889501777",
+              telephone: process.env.NEXT_PUBLIC_PHONE_USA,
               contactType: "customer service",
               availableLanguage: "English",
               areaServed: ["US", "GB", "CA"],

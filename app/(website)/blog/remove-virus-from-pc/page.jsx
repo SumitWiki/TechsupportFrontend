@@ -182,7 +182,7 @@ export default function BlogPost() {
             <p className="mt-2 text-red-200 max-w-lg mx-auto">Our technicians can remove stubborn malware and secure your PC remotely.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
               <Link href="/contact" className="inline-flex items-center justify-center bg-white text-red-700 px-8 py-3 rounded-xl font-semibold hover:bg-red-50 transition">Start Secure Session</Link>
-              <a href="tel:+18889501777" className="inline-flex items-center justify-center bg-yellow-500 text-slate-900 px-8 py-3 rounded-xl font-semibold hover:bg-yellow-400 transition">Call 1-888-950-1777</a>
+              <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="inline-flex items-center justify-center bg-yellow-500 text-slate-900 px-8 py-3 rounded-xl font-semibold hover:bg-yellow-400 transition">Call {process.env.NEXT_PUBLIC_PHONE_DISPLAY}</a>
             </div>
           </div>
 

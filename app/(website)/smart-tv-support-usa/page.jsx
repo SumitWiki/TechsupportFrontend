@@ -95,7 +95,7 @@ export default function SmartTVSupportUSA() {
               </p>
               <div className="flex flex-wrap gap-4 mt-8">
                 <Link href="/contact" className="bg-white text-orange-700 px-8 py-3.5 rounded-xl font-bold hover:bg-orange-50 transition shadow-lg">Get Help Now</Link>
-                <a href="tel:+18889501777" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
+                <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
               </div>
             </div>
             <div className="hidden md:flex justify-center">
@@ -142,7 +142,7 @@ export default function SmartTVSupportUSA() {
           <p className="mt-3 text-orange-100 max-w-xl mx-auto">Enjoy uninterrupted streaming today. Available 24/7.</p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <Link href="/contact" className="bg-white text-orange-700 px-8 py-3.5 rounded-xl font-bold hover:bg-orange-50 transition shadow-lg">Get Smart TV Support</Link>
-            <a href="tel:+18889501777" className="bg-red-800 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-900 transition shadow-lg">Call Now</a>
+            <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="bg-red-800 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-900 transition shadow-lg">Call Now</a>
           </div>
         </div>
       </section>

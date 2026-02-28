@@ -698,10 +698,10 @@ export default function CompleteInternetRouterTroubleshootingGuide() {
                 Start Secure Session
               </Link>
               <a
-                href="tel:+18889501777"
+                href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`}
                 className="inline-flex items-center justify-center border-2 border-white/30 text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/10 transition"
               >
-                Call 1-888-950-1777
+                Call {process.env.NEXT_PUBLIC_PHONE_DISPLAY}
               </a>
             </div>
           </div>

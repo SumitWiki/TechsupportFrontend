@@ -219,7 +219,7 @@ export default function BlogIndex() {
           <p className="mt-2 text-blue-100">Our certified technicians are available 24/7 to diagnose and fix any tech issue remotely.</p>
           <div className="flex flex-wrap justify-center gap-4 mt-6">
             <Link href="/contact" className="bg-white text-blue-700 px-8 py-3 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg">Get Expert Support</Link>
-            <a href="tel:+18889501777" className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+            <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
           </div>
         </div>
 

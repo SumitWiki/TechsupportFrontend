@@ -61,7 +61,7 @@ export default function WifiRouterSupportUSA() {
               <p className="mt-4 text-lg text-green-100 max-w-xl">Slow Wi-Fi, router disconnecting, or setup issues? Get secure remote network support from certified specialists.</p>
               <div className="flex flex-wrap gap-4 mt-8">
                 <Link href="/contact" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Get Wi-Fi Support Now</Link>
-                <a href="tel:+18889501777" className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
+                <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="bg-white/10 border border-white/30 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-white/20 transition">Call Now</a>
               </div>
             </div>
             <div className="hidden md:flex justify-center">
@@ -108,7 +108,7 @@ export default function WifiRouterSupportUSA() {
           <p className="mt-3 text-green-100 max-w-xl mx-auto">Get stable &amp; secure internet today. Available 24/7, 365 days.</p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <Link href="/contact" className="bg-white text-green-700 px-8 py-3.5 rounded-xl font-bold hover:bg-green-50 transition shadow-lg">Get Wi-Fi Support</Link>
-            <a href="tel:+18889501777" className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+            <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
           </div>
         </div>
       </section>

@@ -35,7 +35,7 @@ export default function ContactPage() {
               "@type": "Organization",
               name: "TechSupport4",
               email: "support@techsupport4.com",
-              telephone: "+18889501777",
+              telephone: process.env.NEXT_PUBLIC_PHONE_USA,
               url: "https://techsupport4.com",
             },
           }),

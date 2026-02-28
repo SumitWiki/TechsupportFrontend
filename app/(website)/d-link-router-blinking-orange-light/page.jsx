@@ -95,7 +95,7 @@ export default function DLinkBlinkingOrangeLight() {
             <p className="mt-2 text-blue-200 max-w-lg mx-auto">Our technicians can diagnose D-Link LED issues remotely.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
               <Link href="/contact" className="inline-flex items-center justify-center bg-white text-blue-700 px-8 py-3 rounded-xl font-semibold hover:bg-blue-50 transition">Start Secure Session</Link>
-              <a href="tel:+18889501777" className="inline-flex items-center justify-center border-2 border-white/30 text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/10 transition">Call 1-888-950-1777</a>
+              <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="inline-flex items-center justify-center border-2 border-white/30 text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/10 transition">Call {process.env.NEXT_PUBLIC_PHONE_DISPLAY}</a>
             </div>
           </div>
 

@@ -147,7 +147,7 @@ export default function BlogPost() {
             <p className="mt-2 text-green-200 max-w-lg mx-auto">Available 24/7 across USA, UK and Canada.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
               <Link href="/contact" className="inline-flex items-center justify-center bg-white text-green-700 px-8 py-3 rounded-xl font-semibold hover:bg-green-50 transition">Start Secure Session</Link>
-              <a href="tel:+18889501777" className="inline-flex items-center justify-center bg-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-red-700 transition">Call Now</a>
+              <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="inline-flex items-center justify-center bg-red-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-red-700 transition">Call Now</a>
             </div>
           </div>
 

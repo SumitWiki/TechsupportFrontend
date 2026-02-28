@@ -99,7 +99,7 @@ export default function FAQPage() {
             <p className="mt-2 text-blue-100">Our team is available 24/7 to help.</p>
             <div className="flex flex-wrap justify-center gap-4 mt-6">
               <a href="/contact" className="bg-white text-blue-700 px-8 py-3 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg">Contact Support</a>
-              <a href="tel:+18889501777" className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
+              <a href={`tel:${process.env.NEXT_PUBLIC_PHONE_USA}`} className="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 transition shadow-lg">Call Now</a>
             </div>
           </div>
 
