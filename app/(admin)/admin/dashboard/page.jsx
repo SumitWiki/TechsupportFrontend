@@ -33,6 +33,8 @@ const I = {
   chevDown: (c = "w-4 h-4") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>,
   shield: (c = "w-5 h-5") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>,
   pencil: (c = "w-4 h-4") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>,
+  mail: (c = "w-5 h-5") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>,
+  note: (c = "w-4 h-4") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>,
 };
 
 /* ───────── HELPERS ───────── */
@@ -198,6 +200,16 @@ export default function Dashboard() {
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [newCustomer, setNewCustomer] = useState({ name: "", email: "", phone: "", address: "", amount: "", paid_amount: "", offer: "" });
   const [customerSearch, setCustomerSearch] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null); // customer detail panel
+  const [customerDetail, setCustomerDetail] = useState(null); // full detail with notes + email logs
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailForm, setEmailForm] = useState({ subject: "", body: "" });
+  const [emailSending, setEmailSending] = useState(false);
+  const [customerNoteText, setCustomerNoteText] = useState("");
+  const [selectedEmails, setSelectedEmails] = useState(new Set()); // for bulk email checkbox
+
+  /* ── Delete approvals ── */
+  const [approvals, setApprovals] = useState([]);
 
   /* ── Team view toggle ── */
   const [teamView, setTeamView] = useState("team"); // "team" | "user"
@@ -258,6 +270,7 @@ export default function Dashboard() {
       if (admin) {
         promises.push(api("/api/users/"));
         promises.push(api("/api/cases/audit?limit=30"));
+        promises.push(api("/api/approvals"));
       }
       const results = await Promise.allSettled(promises);
 
@@ -282,6 +295,10 @@ export default function Dashboard() {
       if (admin && results[5]?.status === "fulfilled" && results[5].value.ok) {
         const d = await results[5].value.json();
         setAuditLogs(d.logs || []);
+      }
+      if (admin && results[6]?.status === "fulfilled" && results[6].value.ok) {
+        const d = await results[6].value.json();
+        setApprovals(d.requests || []);
       }
     } catch (err) {
       console.error("Dashboard load error:", err);
@@ -618,6 +635,115 @@ export default function Dashboard() {
       )
     : customers;
 
+  /* ── Customer detail panel ── */
+  const viewCustomerDetail = async (id) => {
+    setSelectedCustomer(id);
+    setCustomerDetail(null);
+    try {
+      const res = await api(`/api/customers/${id}`);
+      if (res.ok) {
+        const d = await res.json();
+        setCustomerDetail(d);
+      } else setToast({ message: "Failed to load customer details", type: "error" });
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  const closeCustomerDetail = () => { setSelectedCustomer(null); setCustomerDetail(null); setCustomerNoteText(""); };
+
+  /* ── Send email to customer ── */
+  const sendCustomerEmail = async () => {
+    if (!customerDetail) return;
+    if (!emailForm.subject.trim() || !emailForm.body.trim()) { setToast({ message: "Subject and body are required", type: "error" }); return; }
+    if (!confirm(`Send email to ${customerDetail.name} (${customerDetail.email})?`)) return;
+    setEmailSending(true);
+    try {
+      const res = await api(`/api/customers/${customerDetail.id}/email`, { method: "POST", body: JSON.stringify(emailForm) });
+      const d = await res.json();
+      if (res.ok) {
+        setToast({ message: d.message || `Email sent to ${customerDetail.name}`, type: "success" });
+        setShowEmailModal(false);
+        setEmailForm({ subject: "", body: "" });
+        viewCustomerDetail(customerDetail.id); // refresh to show new email log
+      } else setToast({ message: d.error || `Failed to send email to ${customerDetail.name}`, type: "error" });
+    } catch { setToast({ message: "Network error", type: "error" }); }
+    finally { setEmailSending(false); }
+  };
+
+  /* ── Bulk email to selected customers ── */
+  const toggleEmailSelection = (id) => {
+    setSelectedEmails(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  /* ── Add note to customer ── */
+  const addCustomerNote = async () => {
+    if (!customerDetail || !customerNoteText.trim()) return;
+    try {
+      const res = await api(`/api/customers/${customerDetail.id}/notes`, { method: "POST", body: JSON.stringify({ note: customerNoteText }) });
+      const d = await res.json();
+      if (res.ok) {
+        setToast({ message: "Note added", type: "success" });
+        setCustomerNoteText("");
+        viewCustomerDetail(customerDetail.id); // refresh
+      } else setToast({ message: d.error || "Failed to add note", type: "error" });
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  /* ── CSV export ── */
+  const exportCustomersCSV = async () => {
+    try {
+      const res = await api("/api/customers/export");
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url; a.download = "customers.csv"; a.click();
+        URL.revokeObjectURL(url);
+        setToast({ message: "CSV downloaded", type: "success" });
+      } else setToast({ message: "Export failed", type: "error" });
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  /* ── Delete approval handlers ── */
+  const handleApproveDelete = async (id) => {
+    if (!confirm("Approve this delete request? The item will be permanently deleted.")) return;
+    try {
+      const res = await api(`/api/approvals/${id}/approve`, { method: "POST" });
+      const d = await res.json();
+      if (res.ok) { setToast({ message: d.message || "Approved & deleted", type: "success" }); loadData(true); }
+      else setToast({ message: d.error || "Failed to approve", type: "error" });
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  const handleRejectDelete = async (id) => {
+    if (!confirm("Reject this delete request?")) return;
+    try {
+      const res = await api(`/api/approvals/${id}/reject`, { method: "POST" });
+      const d = await res.json();
+      if (res.ok) { setToast({ message: "Request rejected", type: "success" }); loadData(true); }
+      else setToast({ message: d.error || "Failed to reject", type: "error" });
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  /* ── Update handleDeleteCustomer for approval workflow ── */
+  const handleDeleteCustomerUpdated = async (id, name) => {
+    const msg = isSuperAdminUser(user)
+      ? `Permanently delete customer "${name}"?`
+      : `Request approval to delete customer "${name}"? A super admin will review your request.`;
+    if (!confirm(msg)) return;
+    try {
+      const res = await api(`/api/customers/${id}`, { method: "DELETE" });
+      const d = await res.json();
+      if (res.ok) {
+        setToast({ message: d.message || (isSuperAdminUser(user) ? "Customer deleted" : "Delete request submitted for approval"), type: "success" });
+        if (selectedCustomer === id) closeCustomerDetail();
+        loadData(true);
+      } else setToast({ message: d.error || "Failed", type: "error" });
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
   /* ── Computed chart data ── */
   const weeklyLeads = useMemo(() => {
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -668,12 +794,15 @@ export default function Dashboard() {
     { key: "search", label: "Search", icon: I.search },
     { key: "customers", label: "Customers", icon: I.users },
     ...(isAdminPlus(user) ? [
-      { key: "team", label: "Team", icon: I.team },
+      { key: "team", label: "Users", icon: I.key },
       { key: "activity", label: "Activity Log", icon: I.activity },
+    ] : []),
+    ...(isSuperAdminUser(user) ? [
+      { key: "approvals", label: "Approvals", icon: I.shield, badge: approvals.filter(a => a.status === "pending").length || null },
     ] : []),
   ];
 
-  const TITLES = { overview: "Dashboard Overview", leads: "Ticket Management", search: "Search Customer", customers: "Customer Management", team: "User Management", activity: "Activity Log" };
+  const TITLES = { overview: "Dashboard Overview", leads: "Ticket Management", search: "Search Customer", customers: "Customer Management", team: "User Management", activity: "Activity Log", approvals: "Delete Approvals" };
 
   const statCards = stats ? [
     { label: "Total Leads", value: (Number(stats.total) || 0).toLocaleString(), sub: `${Number(stats.today) || 0} today`, icon: I.users, color: "bg-blue-600" },
@@ -719,6 +848,9 @@ export default function Dashboard() {
                 {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-blue-500 rounded-r-full" />}
                 <span className={`flex-shrink-0 ${isActive ? "text-blue-400" : "text-slate-500 group-hover:text-slate-300"}`}>{n.icon()}</span>
                 {sidebarOpen && <span>{n.label}</span>}
+                {n.badge && (
+                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">{n.badge}</span>
+                )}
               </button>
             );
           })}
@@ -1561,151 +1693,297 @@ export default function Dashboard() {
 
           {/* ══════ CUSTOMERS TAB ══════ */}
           {activeTab === "customers" && (
-            <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800">
-              <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Customer Management</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{customers.length} customers</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <input type="text" placeholder="Search customers..." value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)}
-                      className="pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-52 transition" />
-                    {I.search("w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400")}
+            <div className="flex gap-5">
+              {/* ── Customer List Panel ── */}
+              <div className={`bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 ${selectedCustomer ? "w-1/2 hidden lg:block" : "w-full"}`}>
+                <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Customer Management</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{customers.length} customers</p>
                   </div>
-                  {(isAdminPlus(user) || canDo(user, "write")) && (
-                    <button onClick={() => setShowAddCustomer(true)}
-                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm">
-                      {I.plus("w-4 h-4")} Add Customer
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="relative">
+                      <input type="text" placeholder="Search name, email, mobile..." value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)}
+                        className="pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-56 transition" />
+                      {I.search("w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400")}
+                    </div>
+                    <button onClick={exportCustomersCSV}
+                      className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition shadow-sm" title="Download CSV">
+                      {I.download("w-4 h-4")} CSV
                     </button>
-                  )}
+                    {(isAdminPlus(user) || canDo(user, "write")) && (
+                      <button onClick={() => setShowAddCustomer(true)}
+                        className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition shadow-sm">
+                        {I.plus("w-4 h-4")} Add Customer
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Add Customer Form (inline) */}
+                {showAddCustomer && (
+                  <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">Add New Customer</h4>
+                      <button onClick={() => setShowAddCustomer(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">{I.xMark("w-4 h-4")}</button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Name *</label>
+                        <input type="text" required value={newCustomer.name} onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Customer name" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Mobile *</label>
+                        <input type="tel" required value={newCustomer.phone} onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="+1 (555) 000-0000" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Email</label>
+                        <input type="email" value={newCustomer.email} onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="email@example.com" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Address</label>
+                        <input type="text" value={newCustomer.address} onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Street, City, State" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Amount</label>
+                        <input type="number" step="0.01" value={newCustomer.amount} onChange={(e) => setNewCustomer({ ...newCustomer, amount: e.target.value })}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="0.00" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Paid Amount</label>
+                        <input type="number" step="0.01" value={newCustomer.paid_amount} onChange={(e) => setNewCustomer({ ...newCustomer, paid_amount: e.target.value })}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="0.00" />
+                      </div>
+                      <div className="sm:col-span-2 lg:col-span-3">
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Offer / Notes</label>
+                        <input type="text" value={newCustomer.offer} onChange={(e) => setNewCustomer({ ...newCustomer, offer: e.target.value })}
+                          className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Discount, promo code, special offer..." />
+                      </div>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <button onClick={handleAddCustomer}
+                        className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm">
+                        {I.plus("w-4 h-4")} Save Customer
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Customer Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-50/80 dark:bg-slate-900/50">
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Customer</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Contact</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Address</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Amount</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">Offer</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Added By</th>
+                        <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {filteredCustomers.length > 0 ? filteredCustomers.map((c) => (
+                        <tr key={c.id} className={`hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-100 cursor-pointer ${selectedCustomer === c.id ? "bg-blue-50/50 dark:bg-blue-900/10" : ""}`}
+                          onClick={() => viewCustomerDetail(c.id)}>
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-300">
+                                {(c.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                              </div>
+                              <p className="font-medium text-blue-600 dark:text-blue-400 text-[13px] hover:underline">{c.name}</p>
+                            </div>
+                          </td>
+                          <td className="px-5 py-4">
+                            <p className="text-xs text-slate-700 dark:text-slate-300">{c.phone || "—"}</p>
+                            <p className="text-[11px] text-slate-400">{c.email || "—"}</p>
+                          </td>
+                          <td className="px-5 py-4 text-xs text-slate-500 dark:text-slate-400 hidden md:table-cell max-w-[200px] truncate">{c.address || "—"}</td>
+                          <td className="px-5 py-4">
+                            <div>
+                              <p className="text-xs font-semibold text-slate-900 dark:text-white">${parseFloat(c.amount || 0).toFixed(2)}</p>
+                              <p className="text-[11px] text-emerald-600 dark:text-emerald-400">Paid: ${parseFloat(c.paid_amount || 0).toFixed(2)}</p>
+                              {(parseFloat(c.amount || 0) - parseFloat(c.paid_amount || 0)) > 0 && (
+                                <p className="text-[10px] text-amber-600 dark:text-amber-400">Due: ${(parseFloat(c.amount || 0) - parseFloat(c.paid_amount || 0)).toFixed(2)}</p>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-5 py-4 text-xs text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[150px] truncate">{c.offer || "—"}</td>
+                          <td className="px-5 py-4">
+                            <p className="text-xs font-medium text-slate-700 dark:text-slate-300">{c.added_by_name || "System"}</p>
+                            <p className="text-[11px] text-slate-400">{formatDateTime(c.created_at)}</p>
+                          </td>
+                          <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center gap-1.5">
+                              {c.email && (
+                                <button onClick={() => { viewCustomerDetail(c.id); setTimeout(() => setShowEmailModal(true), 300); }}
+                                  className="px-2 py-1 rounded-md text-[11px] font-medium text-blue-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition" title="Send email">
+                                  {I.mail("w-3.5 h-3.5")}
+                                </button>
+                              )}
+                              {(isSuperAdminUser(user) || canDo(user, "delete")) && (
+                                <button onClick={() => handleDeleteCustomerUpdated(c.id, c.name)}
+                                  className="px-2 py-1 rounded-md text-[11px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition" title="Delete customer">
+                                  {I.trash("w-3.5 h-3.5")}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )) : (
+                        <tr>
+                          <td colSpan={7} className="px-5 py-16 text-center">
+                            {I.users("w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto")}
+                            <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
+                              {customerSearch ? "No customers match your search" : "No customers yet"}
+                            </p>
+                            {!customerSearch && (isAdminPlus(user) || canDo(user, "write")) && (
+                              <button onClick={() => setShowAddCustomer(true)} className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium">Add your first customer</button>
+                            )}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
-              {/* Add Customer Form (inline) */}
-              {showAddCustomer && (
-                <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Add New Customer</h4>
-                    <button onClick={() => setShowAddCustomer(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">{I.xMark("w-4 h-4")}</button>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Name *</label>
-                      <input type="text" required value={newCustomer.name} onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Customer name" />
+              {/* ── Customer Detail Panel ── */}
+              {selectedCustomer && (
+                <div className="w-full lg:w-1/2 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 overflow-y-auto max-h-[85vh]">
+                  {!customerDetail ? (
+                    <div className="flex items-center justify-center h-40">
+                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent" />
                     </div>
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Mobile *</label>
-                      <input type="tel" required value={newCustomer.phone} onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="+1 (555) 000-0000" />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Email</label>
-                      <input type="email" value={newCustomer.email} onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="email@example.com" />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Address</label>
-                      <input type="text" value={newCustomer.address} onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Street, City, State" />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Amount</label>
-                      <input type="number" step="0.01" value={newCustomer.amount} onChange={(e) => setNewCustomer({ ...newCustomer, amount: e.target.value })}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="0.00" />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Paid Amount</label>
-                      <input type="number" step="0.01" value={newCustomer.paid_amount} onChange={(e) => setNewCustomer({ ...newCustomer, paid_amount: e.target.value })}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="0.00" />
-                    </div>
-                    <div className="sm:col-span-2 lg:col-span-3">
-                      <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Offer / Notes</label>
-                      <input type="text" value={newCustomer.offer} onChange={(e) => setNewCustomer({ ...newCustomer, offer: e.target.value })}
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Discount, promo code, special offer..." />
-                    </div>
-                  </div>
-                  <div className="flex justify-end mt-4">
-                    <button onClick={handleAddCustomer}
-                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm">
-                      {I.plus("w-4 h-4")} Save Customer
-                    </button>
-                  </div>
+                  ) : (
+                    <>
+                      {/* Detail Header */}
+                      <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center text-sm font-bold text-blue-600 dark:text-blue-300">
+                              {(customerDetail.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                              <h3 className="text-base font-bold text-slate-900 dark:text-white">{customerDetail.name}</h3>
+                              <p className="text-xs text-slate-400">{customerDetail.email || "No email"} · {customerDetail.phone || "No phone"}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {customerDetail.email && (
+                            <button onClick={() => setShowEmailModal(true)}
+                              className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                              {I.mail("w-3.5 h-3.5")} Email
+                            </button>
+                          )}
+                          <button onClick={closeCustomerDetail} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                            {I.xMark("w-4 h-4")}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Detail Info */}
+                      <div className="p-5 border-b border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-4">
+                        <div><p className="text-[10px] font-semibold text-slate-400 uppercase">Address</p><p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5">{customerDetail.address || "—"}</p></div>
+                        <div><p className="text-[10px] font-semibold text-slate-400 uppercase">Amount</p><p className="text-xs font-bold text-slate-900 dark:text-white mt-0.5">${parseFloat(customerDetail.amount || 0).toFixed(2)}</p></div>
+                        <div><p className="text-[10px] font-semibold text-slate-400 uppercase">Paid</p><p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">${parseFloat(customerDetail.paid_amount || 0).toFixed(2)}</p></div>
+                        <div><p className="text-[10px] font-semibold text-slate-400 uppercase">Offer</p><p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5">{customerDetail.offer || "—"}</p></div>
+                        <div><p className="text-[10px] font-semibold text-slate-400 uppercase">Added By</p><p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5">{customerDetail.added_by_name || "System"}</p></div>
+                        <div><p className="text-[10px] font-semibold text-slate-400 uppercase">Created</p><p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5">{formatDateTime(customerDetail.created_at)}</p></div>
+                      </div>
+
+                      {/* Notes Section */}
+                      <div className="p-5 border-b border-slate-200 dark:border-slate-800">
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
+                          {I.note("w-4 h-4 text-amber-500")} Notes ({customerDetail.notes?.length || 0})
+                        </h4>
+                        {/* Add Note */}
+                        <div className="flex gap-2 mb-3">
+                          <input type="text" placeholder="Add a note..." value={customerNoteText} onChange={(e) => setCustomerNoteText(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && addCustomerNote()}
+                            className="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                          <button onClick={addCustomerNote} disabled={!customerNoteText.trim()}
+                            className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-lg text-xs font-semibold transition">
+                            Add
+                          </button>
+                        </div>
+                        {/* Notes List */}
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                          {customerDetail.notes?.length > 0 ? customerDetail.notes.map((n) => (
+                            <div key={n.id} className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+                              <p className="text-xs text-slate-700 dark:text-slate-300">{n.note}</p>
+                              <p className="text-[10px] text-slate-400 mt-1">{n.user_name} · {formatDateTime(n.created_at)}</p>
+                            </div>
+                          )) : <p className="text-xs text-slate-400 text-center py-4">No notes yet</p>}
+                        </div>
+                      </div>
+
+                      {/* Email Logs Section */}
+                      <div className="p-5">
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
+                          {I.mail("w-4 h-4 text-blue-500")} Email History ({customerDetail.emailLogs?.length || 0})
+                        </h4>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                          {customerDetail.emailLogs?.length > 0 ? customerDetail.emailLogs.map((e) => (
+                            <div key={e.id} className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-semibold text-slate-900 dark:text-white">{e.subject}</p>
+                                <span className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-bold ${e.status === "sent" ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300" : "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300"}`}>
+                                  {e.status}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{e.body}</p>
+                              <p className="text-[10px] text-slate-400 mt-1">To: {e.to_email} · By: {e.sender_name} · {formatDateTime(e.created_at)}</p>
+                            </div>
+                          )) : <p className="text-xs text-slate-400 text-center py-4">No emails sent yet</p>}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
 
-              {/* Customer Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-slate-50/80 dark:bg-slate-900/50">
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Customer</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Contact</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Address</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Amount</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">Offer</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Added By</th>
-                      <th className="text-left px-5 py-3.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {filteredCustomers.length > 0 ? filteredCustomers.map((c) => (
-                      <tr key={c.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors duration-100">
-                        <td className="px-5 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center text-xs font-bold text-blue-600 dark:text-blue-300">
-                              {(c.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
-                            </div>
-                            <p className="font-medium text-slate-900 dark:text-white text-[13px]">{c.name}</p>
-                          </div>
-                        </td>
-                        <td className="px-5 py-4">
-                          <p className="text-xs text-slate-700 dark:text-slate-300">{c.phone || "—"}</p>
-                          <p className="text-[11px] text-slate-400">{c.email || "—"}</p>
-                        </td>
-                        <td className="px-5 py-4 text-xs text-slate-500 dark:text-slate-400 hidden md:table-cell max-w-[200px] truncate">{c.address || "—"}</td>
-                        <td className="px-5 py-4">
-                          <div>
-                            <p className="text-xs font-semibold text-slate-900 dark:text-white">${parseFloat(c.amount || 0).toFixed(2)}</p>
-                            <p className="text-[11px] text-emerald-600 dark:text-emerald-400">Paid: ${parseFloat(c.paid_amount || 0).toFixed(2)}</p>
-                            {(parseFloat(c.amount || 0) - parseFloat(c.paid_amount || 0)) > 0 && (
-                              <p className="text-[10px] text-amber-600 dark:text-amber-400">Due: ${(parseFloat(c.amount || 0) - parseFloat(c.paid_amount || 0)).toFixed(2)}</p>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-5 py-4 text-xs text-slate-500 dark:text-slate-400 hidden lg:table-cell max-w-[150px] truncate">{c.offer || "—"}</td>
-                        <td className="px-5 py-4">
-                          <p className="text-xs font-medium text-slate-700 dark:text-slate-300">{c.added_by_name || "System"}</p>
-                          <p className="text-[11px] text-slate-400">{formatDateTime(c.created_at)}</p>
-                        </td>
-                        <td className="px-5 py-4">
-                          <div className="flex items-center gap-1.5">
-                            {(isSuperAdminUser(user) || canDo(user, "delete")) && (
-                              <button onClick={() => handleDeleteCustomer(c.id, c.name)}
-                                className="px-2 py-1 rounded-md text-[11px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 transition" title="Delete customer">
-                                {I.trash("w-3.5 h-3.5")}
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    )) : (
-                      <tr>
-                        <td colSpan={7} className="px-5 py-16 text-center">
-                          {I.users("w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto")}
-                          <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
-                            {customerSearch ? "No customers match your search" : "No customers yet"}
-                          </p>
-                          {!customerSearch && (isAdminPlus(user) || canDo(user, "write")) && (
-                            <button onClick={() => setShowAddCustomer(true)} className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium">Add your first customer</button>
-                          )}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              {/* ── Email Compose Modal ── */}
+              {showEmailModal && customerDetail && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowEmailModal(false)}>
+                  <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-5">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">{I.mail("w-5 h-5 text-blue-500")} Send Email</h3>
+                      <button onClick={() => setShowEmailModal(false)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">{I.xMark("w-4 h-4")}</button>
+                    </div>
+                    <div className="mb-4">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">To: <span className="font-semibold text-slate-700 dark:text-slate-300">{customerDetail.name}</span> ({customerDetail.email})</p>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Subject *</label>
+                        <input type="text" value={emailForm.subject} onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Email subject" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Body *</label>
+                        <textarea rows={6} value={emailForm.body} onChange={(e) => setEmailForm({ ...emailForm, body: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none" placeholder="Email body..." />
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-3 mt-5">
+                      <button onClick={() => setShowEmailModal(false)}
+                        className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
+                      <button onClick={sendCustomerEmail} disabled={emailSending}
+                        className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-5 py-2 rounded-lg text-sm font-semibold transition shadow-sm">
+                        {emailSending ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> : I.mail("w-4 h-4")}
+                        {emailSending ? "Sending..." : "Send Email"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1741,6 +2019,60 @@ export default function Dashboard() {
                   <div className="px-5 py-16 text-center">
                     {I.activity("w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto")}
                     <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">No audit activity yet</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══════ APPROVALS TAB (Super Admin Only) ══════ */}
+          {activeTab === "approvals" && isSuperAdminUser(user) && (
+            <div className="bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800">
+              <div className="p-5 border-b border-slate-200 dark:border-slate-800">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">{I.shield("w-5 h-5 text-amber-500")} Delete Approval Requests</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Review and approve or reject deletion requests from team members</p>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {approvals.length > 0 ? approvals.map((a) => {
+                  const isPending = a.status === "pending";
+                  return (
+                    <div key={a.id} className="px-5 py-4 flex items-start gap-4 hover:bg-slate-50 dark:hover:bg-slate-900/40 transition">
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${isPending ? "bg-amber-50 dark:bg-amber-500/10 text-amber-600" : a.status === "approved" ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600" : "bg-red-50 dark:bg-red-500/10 text-red-600"}`}>
+                        {isPending ? I.bell("w-4 h-4") : a.status === "approved" ? I.check("w-4 h-4") : I.xMark("w-4 h-4")}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-medium text-slate-800 dark:text-slate-200">
+                          Delete {a.target_type}: <span className="font-bold">{a.target_name}</span>
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          Requested by <span className="font-medium">{a.requester_name || "Unknown"}</span>
+                          {a.reason && <> — {a.reason}</>}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase ${isPending ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300" : a.status === "approved" ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300"}`}>
+                            {a.status}
+                          </span>
+                          <span className="text-[11px] text-slate-400">{formatDateTime(a.created_at)}</span>
+                        </div>
+                      </div>
+                      {isPending && (
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button onClick={() => handleApproveDelete(a.id)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition">
+                            {I.check("w-3.5 h-3.5")} Approve
+                          </button>
+                          <button onClick={() => handleRejectDelete(a.id)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition">
+                            {I.xMark("w-3.5 h-3.5")} Reject
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }) : (
+                  <div className="px-5 py-16 text-center">
+                    {I.shield("w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto")}
+                    <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">No approval requests</p>
                   </div>
                 )}
               </div>
