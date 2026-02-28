@@ -214,6 +214,11 @@ export default function Dashboard() {
   /* ── Team view toggle ── */
   const [teamView, setTeamView] = useState("team"); // "team" | "user"
 
+  /* ── Edit user modal (role + permissions) ── */
+  const [editingUser, setEditingUser] = useState(null); // user object being edited
+  const [editRole, setEditRole] = useState("user");
+  const [editPerms, setEditPerms] = useState({ read: true, write: false, modify: false, delete: false });
+
   /* ── api helper with automatic token refresh ── */
   const refreshLock = useRef(null);
   const api = useCallback(async (path, opts = {}) => {
@@ -561,12 +566,18 @@ export default function Dashboard() {
   };
 
   const deleteUser = async (id) => {
-    if (!confirm("Are you sure you want to delete this user? This cannot be undone.")) return;
+    const target = teamUsers.find(u => u.id === id);
+    if (!confirm(`Permanently delete user "${target?.name || "this user"}"? All their data (login logs, notes, email logs, etc.) will be permanently removed. This cannot be undone.`)) return;
     try {
       const res = await api(`/api/users/${id}`, { method: "DELETE" });
-      if (res.ok) setTeamUsers((prev) => prev.filter((u) => u.id !== id));
-      else { const d = await res.json(); alert(d.error || "Failed to delete user"); }
-    } catch {}
+      if (res.ok) {
+        setTeamUsers((prev) => prev.filter((u) => u.id !== id));
+        setToast({ message: `User "${target?.name}" permanently deleted`, type: "success" });
+      } else {
+        const d = await res.json();
+        setToast({ message: d.error || "Failed to delete user", type: "error" });
+      }
+    } catch { setToast({ message: "Network error", type: "error" }); }
   };
 
   const forceLogoutUser = async (id) => {
@@ -580,15 +591,22 @@ export default function Dashboard() {
   };
 
   const changeUserRole = async (id, newRole) => {
+    const target = teamUsers.find(u => u.id === id);
+    if (!confirm(`Change ${target?.name || "this user"}'s role to ${ROLE_LABELS[newRole] || newRole}?`)) {
+      loadData(true); // revert the select back
+      return;
+    }
     try {
       const res = await api(`/api/users/${id}`, { method: "PUT", body: JSON.stringify({ role: newRole }) });
       if (res.ok) {
         setTeamUsers((prev) => prev.map((u) => u.id === id ? { ...u, role: newRole } : u));
+        setToast({ message: `Role updated to ${ROLE_LABELS[newRole]}`, type: "success" });
       } else {
         const d = await res.json();
-        alert(d.error || "Failed to change role");
+        setToast({ message: d.error || "Failed to change role", type: "error" });
+        loadData(true);
       }
-    } catch {}
+    } catch { setToast({ message: "Network error", type: "error" }); loadData(true); }
   };
 
   /* ── Update user permissions ── */
@@ -601,6 +619,41 @@ export default function Dashboard() {
       } else {
         const d = await res.json();
         setToast({ message: d.error || "Failed to update permissions", type: "error" });
+      }
+    } catch { setToast({ message: "Network error", type: "error" }); }
+  };
+
+  /* ── Open edit-user modal (super admin only) ── */
+  const openEditUser = (m) => {
+    const perms = typeof m.permissions === "string" ? (() => { try { return JSON.parse(m.permissions); } catch { return {}; } })() : (m.permissions || {});
+    setEditingUser(m);
+    setEditRole(m.role);
+    setEditPerms({ read: !!perms.read, write: !!perms.write, modify: !!perms.modify, delete: !!perms.delete });
+  };
+
+  const saveEditUser = async () => {
+    if (!editingUser) return;
+    const changes = {};
+    if (editRole !== editingUser.role) changes.role = editRole;
+    // Only send permissions for 'user' role
+    if (editRole === "user") changes.permissions = editPerms;
+
+    if (!Object.keys(changes).length) { setEditingUser(null); return; }
+    if (!confirm(`Confirm changes for ${editingUser.name}?\n${changes.role ? `Role → ${ROLE_LABELS[changes.role]}` : ""}${changes.permissions ? `\nPermissions: ${PERMS.filter(p => editPerms[p]).join(", ") || "none"}` : ""}`)) return;
+
+    try {
+      const res = await api(`/api/users/${editingUser.id}`, { method: "PUT", body: JSON.stringify(changes) });
+      if (res.ok) {
+        setTeamUsers((prev) => prev.map((u) => u.id === editingUser.id ? {
+          ...u,
+          ...(changes.role ? { role: changes.role } : {}),
+          ...(changes.permissions ? { permissions: JSON.stringify(changes.permissions) } : {}),
+        } : u));
+        setToast({ message: `${editingUser.name} updated successfully`, type: "success" });
+        setEditingUser(null);
+      } else {
+        const d = await res.json();
+        setToast({ message: d.error || "Failed to update user", type: "error" });
       }
     } catch { setToast({ message: "Network error", type: "error" }); }
   };
@@ -1583,6 +1636,10 @@ export default function Dashboard() {
                                   )}
                                   {isSuperAdminUser(user) && (
                                     <>
+                                      <button onClick={() => openEditUser(m)}
+                                        className="px-2 py-1 rounded-md text-[11px] font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20 transition" title="Modify role & permissions">
+                                        {I.pencil("w-3 h-3")} <span className="ml-0.5">Modify</span>
+                                      </button>
                                       <button onClick={() => { setResetPwdUser(m); setResetPwdValue(""); setResetPwdError(""); }}
                                         className="px-2 py-1 rounded-md text-[11px] font-medium bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Reset password">
                                         {I.key("w-3 h-3")}
@@ -1671,6 +1728,10 @@ export default function Dashboard() {
                             )}
                             {isSuperAdminUser(user) && (
                               <>
+                                <button onClick={() => openEditUser(m)}
+                                  className="px-2 py-1 rounded-md text-[11px] font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20 transition" title="Modify role & permissions">
+                                  {I.pencil("w-3 h-3")} <span className="ml-0.5">Modify</span>
+                                </button>
                                 <button onClick={() => { setResetPwdUser(m); setResetPwdValue(""); setResetPwdError(""); }}
                                   className="px-2 py-1 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Reset password">
                                   {I.key("w-3 h-3")}
@@ -2083,6 +2144,74 @@ export default function Dashboard() {
       </div>
 
       {/* ═══════════ MODALS ═══════════ */}
+
+      {/* Edit User Modal (Super Admin — Modify Role & Permissions) */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setEditingUser(null)}>
+          <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">{I.pencil("w-5 h-5 text-blue-500")} Modify User</h3>
+              <button onClick={() => setEditingUser(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">{I.xMark()}</button>
+            </div>
+
+            {/* User info */}
+            <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl mb-5">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-sm font-bold text-slate-600 dark:text-slate-300">
+                {(editingUser.name || "?").split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white text-sm">{editingUser.name}</p>
+                <p className="text-xs text-slate-400">{editingUser.email}</p>
+              </div>
+            </div>
+
+            {/* Role */}
+            <div className="mb-5">
+              <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Role</label>
+              <div className="grid grid-cols-3 gap-2">
+                {VALID_ROLES.filter(r => r !== "super_admin").map((r) => (
+                  <button key={r} onClick={() => setEditRole(r)}
+                    className={`px-3 py-2.5 rounded-xl text-xs font-semibold border-2 transition ${editRole === r ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"}`}>
+                    {ROLE_LABELS[r]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Permissions (only for user role) */}
+            {editRole === "user" && (
+              <div className="mb-5">
+                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Permissions</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {PERMS.map((p) => (
+                    <label key={p} className={`flex items-center gap-2 text-sm rounded-xl px-3 py-2.5 border-2 cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-800 ${editPerms[p] ? "border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5" : "border-slate-200 dark:border-slate-700"}`}>
+                      <input type="checkbox" checked={!!editPerms[p]}
+                        onChange={() => setEditPerms({ ...editPerms, [p]: !editPerms[p] })}
+                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                      <span className="text-slate-700 dark:text-slate-300 font-medium">{p.charAt(0).toUpperCase() + p.slice(1)}</span>
+                    </label>
+                  ))}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1.5">Admin role gets all permissions automatically</p>
+              </div>
+            )}
+            {editRole === "admin" && (
+              <div className="mb-5 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl">
+                <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">Admin role gets full access — all permissions are granted automatically.</p>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setEditingUser(null)}
+                className="px-4 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
+              <button onClick={saveEditUser}
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm">
+                {I.check("w-4 h-4")} Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create User Modal */}
       {showCreateUser && (
