@@ -32,6 +32,7 @@ const I = {
   eye: (c = "w-4 h-4") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
   chevDown: (c = "w-4 h-4") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>,
   shield: (c = "w-5 h-5") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>,
+  pencil: (c = "w-4 h-4") => <svg className={c} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>,
 };
 
 /* ───────── HELPERS ───────── */
@@ -1362,7 +1363,7 @@ export default function Dashboard() {
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mr-1">Permissions:</span>
                 {PERMS.map((p) => (
                   <span key={p} className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2 py-0.5">
-                    {p === "read" ? I.eye("w-3 h-3") : p === "write" ? I.plus("w-3 h-3") : p === "modify" ? I.edit("w-3 h-3") : I.trash("w-3 h-3")}
+                    {p === "read" ? I.eye("w-3 h-3") : p === "write" ? I.plus("w-3 h-3") : p === "modify" ? I.pencil("w-3 h-3") : I.trash("w-3 h-3")}
                     {p.charAt(0).toUpperCase() + p.slice(1)}
                   </span>
                 ))}
