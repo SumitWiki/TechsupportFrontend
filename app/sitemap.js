@@ -137,6 +137,28 @@ export default function sitemap() {
     "internet-not-working-after-changing-router",
   ];
 
+  // Phase 7 — ISP-specific pages (6 new)
+  const ispPhase7Slugs = [
+    "xfinity-internet-not-working",
+    "spectrum-internet-not-working",
+    "spectrum-router-red-light",
+    "verizon-fios-internet-not-working",
+    "comcast-router-not-working",
+    "cox-internet-not-working",
+  ];
+
+  // Phase 7 — Situational long-tail pages (8 new)
+  const situationalPhase7Slugs = [
+    "router-not-working-after-power-outage",
+    "wifi-not-working-after-reset",
+    "xfinity-modem-red-light-blinking",
+    "spectrum-router-blue-light-flashing",
+    "printer-offline-after-windows-11-update",
+    "hp-printer-not-printing-black-ink-only",
+    "outlook-not-sending-emails-after-password-change",
+    "laptop-slow-after-windows-update",
+  ];
+
   // Authority / pillar pages (Phase 6 — 1 page)
   const authoritySlugs = [
     "complete-internet-router-troubleshooting-guide",
@@ -226,6 +248,20 @@ export default function sitemap() {
     changeFrequency: "weekly",
   }));
 
+  const ispPhase7Urls = ispPhase7Slugs.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: now,
+    priority: 0.8,
+    changeFrequency: "monthly",
+  }));
+
+  const situationalPhase7Urls = situationalPhase7Slugs.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: now,
+    priority: 0.8,
+    changeFrequency: "monthly",
+  }));
+
   const blogUrls = blogSlugs.map((slug) => ({
     url: `${baseUrl}/blog/${slug}`,
     lastModified: now,
@@ -240,5 +276,5 @@ export default function sitemap() {
     changeFrequency: "yearly",
   }));
 
-  return [...serviceUrls, ...troubleshootingUrls, ...longTailUrls, ...ispUrls, ...afterSituationUrls, ...authorityUrls, ...locationUrls, blogIndex, ...blogUrls, ...legalUrls];
+  return [...serviceUrls, ...troubleshootingUrls, ...longTailUrls, ...ispUrls, ...afterSituationUrls, ...authorityUrls, ...ispPhase7Urls, ...situationalPhase7Urls, ...locationUrls, blogIndex, ...blogUrls, ...legalUrls];
 }
